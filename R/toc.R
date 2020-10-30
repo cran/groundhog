@@ -1,0 +1,46 @@
+#' Show table of contents (toc) (package versions and publication dates) for a
+#' package, sorted chronologically
+#'
+#' @param pkg (required) package name
+#' @param dependencies logical (defaults to `FALSE`). Should the output contain
+#'    package dependencies (`Imports`, `Depends` and `Suggests`) for `pkg`.
+#'
+#' @return a `data.frame` where each row corresponds to one version of `pkg`.
+#'
+#' @examples
+#' \donttest{
+#' toc("magrittr")
+#' }
+#'
+#' @export
+toc <- function(pkg, dependencies = FALSE) {
+
+  if (is.null(.pkgenv[["cran.toc"]])) {
+    load.cran.toc(update.toc = FALSE)
+  }
+  cran.toc <- .pkgenv[["cran.toc"]]
+
+  if (dependencies) {
+    output <- cran.toc[cran.toc$Package == pkg, c("Version", "Published", "Imports", "Depends", "Suggests", "LinkingTo")]
+  } else {
+    output <- cran.toc[cran.toc$Package == pkg, c("Version", "Published")]
+  }
+
+  if (nrow(output) == 0) {
+    message2()
+    message1(
+      "There is no package '", pkg, "' in our database of all CRAN packages ever posted.\n",
+      "   Keep in mind that:\n",
+      "    1. package names are cAsE seNsiTive\n",
+      "    2. The package name needs to be in quotes: e.g., toc('groundhog') \n",
+      "    3. Only CRAN packages can be loaded via groundhog"
+    )
+    exit()
+  }
+
+
+  output <- output[order(output$Published), ]
+  rownames(output) <- NULL
+
+  return(output)
+}
