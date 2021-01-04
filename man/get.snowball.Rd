@@ -4,28 +4,20 @@
 \alias{get.snowball}
 \title{Generates dataframe with all dependencies needed to install a package, with version and source of installation}
 \usage{
-get.snowball(
-  pkg,
-  date,
-  include.suggests = FALSE,
-  force.source = FALSE,
-  current.deps
-)
+get.snowball(pkg, date, include.suggests = FALSE, force.source = FALSE)
 }
 \arguments{
-\item{pkg}{character. Name of the package to install}
+\item{pkg}{character string with name of target package to load (and install if needed),
+need not be in quotes.}
 
-\item{date}{date (in the format "\%Y-\%m-\%d"), Required date for the package.}
+\item{date}{character string  (yyyy-mm-dd), or date value, with the date which determines the
+version of the package, and all dependencies, to be loaded (and installed if needed).}
 
-\item{include.suggests}{Logical (defaults to \code{FALSE}. Should suggested
-packages be installed?}
+\item{include.suggests}{logical, defaults to \code{FALSE}. When set to \code{TRUE}, installs/
+loads dependencies classified in the DESCRIPTION file as \code{suggested}.}
 
-\item{force.source}{Logical (defaults to \code{FALSE}). If \code{TRUE},` will skip CRAN
-and MRAN attempts, download tar.gz, and install from it.}
-
-\item{current.deps}{Character or character vector listing packages that will
-be loaded/installed based on the date when the version of \R being used was
-released, rather than the value of \code{date}.}
+\item{force.source}{logical (defaults to \code{FALSE}). When set to \code{TRUE}, will not attempt
+installing binary from CRAN or MRAN and instead download source file and install it.}
 }
 \description{
 Generates dataframe with all dependencies needed to install a package, with version and source of installation

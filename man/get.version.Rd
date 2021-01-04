@@ -4,26 +4,22 @@
 \alias{get.version}
 \title{Get version from date}
 \usage{
-get.version(
-  pkg,
-  date,
-  current.deps = c("Rcpp", "RcppArmadillo", "BH", "RcppEigen", "StanHeaders",
-    "RcppParallel", "RcppProgress"),
-  patch = c("current", "max")
-)
+get.version(pkg, date, patch = c("current", "max"))
 }
 \arguments{
-\item{pkg}{character. Name of the package to install}
+\item{pkg}{character string with name of target package to load (and install if needed),
+need not be in quotes.}
 
-\item{date}{date (in the format "\%Y-\%m-\%d"), Required date for the package.}
-
-\item{current.deps}{Character or character vector listing packages that will
-be loaded/installed based on the date when the version of \R being used was
-released, rather than the value of \code{date}.}
+\item{date}{character string  (yyyy-mm-dd), or date value, with the date which determines the
+version of the package, and all dependencies, to be loaded (and installed if needed).}
 
 \item{patch}{Either \code{"current"} for the exact current version of the \code{pkg}
 at the specified date, or \code{"max"} for the version with the same major and
 minor but maximal patch version numbers.}
+}
+\value{
+most recent package version available on requested date (if source
+and binary package versions do not match, the most recent of the two versions is returned.
 }
 \description{
 Get version from date

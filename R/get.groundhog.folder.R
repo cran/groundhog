@@ -1,13 +1,12 @@
   #' Get groundhog folder location
 #'
-#' @return the path to the groundhog folder where groundhog files will be
-#'   stored and where packages loaded with [groundhog.library()] will be
-#'   installed.
+#' @return the path to the groundhog folder, the meta-library where 
+#'   [groundhog.library()] downloads and stores binaries and source files 
 #'
 #' @note you can change the location of this folder by editing the environment
 #'   variable GROUNDHOG_FOLDER. In R, you can do this with the command
 #'   `set.groundhog.folder("path")`.
-#'
+#' 
 #' @examples
 #' \dontrun{
 #' get.groundhog.folder()
@@ -20,62 +19,64 @@
 
 # Function that gets the groundhog folder, or prompts user to create it.
 get.groundhog.folder <- function() {
-  groundhog.folder <- path.expand(Sys.getenv("GROUNDHOG_FOLDER"))
+  
+  #Set main folder with 'cookie files' and default for library
+    main_folder <-  paste0(path.expand("~"), "/R_groundhog")
+    
+    
+  #See if consent has been given  \
+        consent <- (file.exists(main_folder))
+        
+       #If no folder, ask for consent 
+         if (consent == FALSE) {
+            message2()
+            message1("groundhog needs authorization to save files to  '",main_folder, "'\n",
+                    "Enter 'OK' to provide authorization")
+                                  
+            answer <- readline()
+            answer <- gsub("'", "", answer)  #kill the ' if entered
 
-  # If a folder for has not been set, prompt user
-  if (groundhog.folder == "") {
-    # 1. Put the default folder into a variable to show user
-    default.folder <- paste0(path.expand("~"), "/groundhog/")
+            if (toupper(answer)=="OK")
+             {
+             consent <- TRUE
+            }
+         } #End if consent == FALSE
+        
+        if (consent == FALSE)
+          {
+          
+          message("You entred '",answer,"'. Only if you enter 'OK' can you use groundhog.library()")
+          exit()
+          }
+    
+  #Create main folder 
+    dir.create(main_folder, showWarnings = FALSE, recursive = TRUE)
 
-    # a=function() {
-    # 2. Show message asking for the desired folder
-    message2(
-      "*****************  Setting a directory for groundhog   ***********************\n\n",
-      "         <PRESS ENTER> to accept the default directory:\n",
-      "         '",default.folder, "'\n"
-    )#End of message 2
-
-    message1(
-      "You need to set a directory save all packages installed by groundhog.\n",
-      "You may <PRESS ENTER> to use the default for this computer ('", default.folder, "').\n",
-      "Or, type in the folder you would like to use instead (e.g, 'c:/dropbox/groundhog').\n",
-      "Do not include quotes.\n",
-      "If the folder does not already exists, it will be created.\n\n",
-      "Type 'quit' to not choose a directory at this time"
-    )
-
-    message2("************************************************************************************************")
-    answer <- readline(prompt = "Please enter a path for your groundhog folder: >")
-
-    if (tolower(answer) == "quit") {
-      exit("OK folder setting process was stopped.")
-    }
-
-    # 5. Assign groundghog folder to default or answer
-    if (nchar(answer) == 0) {
-      groundhog.folder <- path.expand(file.path("~", "groundhog"))
-    } # End if default answer
-    if (nchar(answer) > 0) {
-      groundhog.folder <- answer
-    } # End if entered answer
-
-    # 6   Set it
-    set.groundhog.folder(groundhog.folder) # see function below
-
-    # 7  Tell user, wait 7 seconds.
-    message1(
-      "The folder was succesfully set to: '", groundhog.folder, "'\n",
-      "You can undo this selection by running: set.groundhog.folder('')\n\n\n\n"
-    )
-  } # End if no groundhog folder
-  return(groundhog.folder)
+  #Path to cookie file with location of folder
+    path_file_storing_groundhog_library_location <- paste0(main_folder ,"/current_groundhog_folder.txt")
+    
+  #If cookie file exists, use it, otherwise, use that same location for library
+      if (file.exists(path_file_storing_groundhog_library_location)) {
+        #Read the cookie file with the location of the library
+          groundhog.folder <- scan(path_file_storing_groundhog_library_location,what='character', quiet=TRUE)
+        
+        } else {
+          
+        #This is the default
+          groundhog.folder <-paste0(main_folder, "/groundhog_library/")
+          
+        #Set it using function below
+          set.groundhog.folder(groundhog.folder) 
+          
+        } #End if cookie file does not exist
+    
+    return(groundhog.folder)
 }
 
 #' Set groundhog folder location
 #'
-#' @param path Character. The path to the groundhog folder where groundhog
-#'   files will be stored and where packages loaded with [groundhog.library()]
-#'   will be installed.
+#' @param path Character. The path to the groundhog folder containing the library
+#'   where packages are downloaded and installed.
 #'
 #' @note This setting can also be achieved by manually editing the `.Renviron`
 #'   file. You can set this globally by editing `~/.Renviron` or only for a
@@ -84,7 +85,7 @@ get.groundhog.folder <- function() {
 #'
 #' @examples
 #' \dontrun{
-#' set.groundhog.folder("~/.groundhog")
+#' set.groundhog.folder("~/.R_groundhog")
 #' }
 #'
 #' @return (invisibly) `TRUE` upon success.
@@ -94,23 +95,19 @@ get.groundhog.folder <- function() {
 #' @seealso [get.groundhog.folder()]
 #'
 set.groundhog.folder <- function(path) {
-  renviron_path <- Sys.getenv("R_ENVIRON", "~/.Renviron")
-
-  if (!file.exists(renviron_path)) {
-    file.create(renviron_path)
-  }
-
-  env_vars <- readRenviron(renviron_path)
-
-  new_setting <- paste0("GROUNDHOG_FOLDER=", path)
-  setting_line <- grep("GROUNDHOG_FOLDER", env_vars)
-
-  if (length(setting_line) > 0) {
-    env_vars[setting_line] <- new_setting
-    writeLines(env_vars, renviron_path)
-  } else {
-    write(new_setting, renviron_path, sep = "\n", append = TRUE)
-  }
-
-  Sys.setenv(GROUNDHOG_FOLDER = path)
-}
+  
+  #Set main folder with 'cookie files' and default for library
+    main_folder <-  paste0(path.expand("~"), "/R_groundhog/")
+    
+  #Create main folder 
+    dir.create(main_folder, showWarnings = FALSE, recursive = TRUE)
+    
+  #Path to file saving groundhog folder
+    path_file_storing_groundhog_library_location <- paste0(main_folder ,"current_groundhog_folder.txt")
+    
+  #Save the cookie
+    cat(path, file = path_file_storing_groundhog_library_location)
+  
+  #Assign it to the live environment
+    Sys.setenv(GROUNDHOG_FOLDER = path)
+    }

@@ -13,7 +13,7 @@ is.pkg_vrs.installed <- function(pkg, vrs) {
 #'
 #' @param x character string containing the date in the format "%Y-%m-%d"
 #'
-as.DateYMD <- function(x) as.Date(x, format = "%Y-%m-%d")
+as.DateYMD <- function(x) as.Date(x, format = "%Y-%m-%d",origin='1970-01-01')
 
 # 2.2  R Being used
 # 2.2.1 R Date
@@ -51,7 +51,7 @@ message2 <- function(..., domain = NULL, appendLF = TRUE, quiet = getOption("qui
   }
   msg <- list(...)
   if (length(msg) == 0) {
-    msg <- c("groundhog.library() says [using R-", get.rversion(), "]:")
+    msg <- c("groundhog says:")
   }
 
   if (.pkgenv[["supportsANSI"]]) {
@@ -148,3 +148,37 @@ base_pkg <- function() {
     "utils"
   )
 }
+
+
+
+is_rstudio <- function() {
+  # More reliable than the env variable because it works as expected even when
+  # code is called from the Terminal tab in RStudio (NOT the Console).
+  identical(.Platform$GUI, "RStudio")
+}
+
+
+
+
+
+get.r.majmin <- function() {
+   major <- as.numeric(R.version$major)
+   minor <- as.numeric(strsplit(R.version$minor, "\\.")[[1]][1])
+   majmin <- paste0(major, ".", minor)
+   return(majmin)
+   }
+   
+ get.r.majmin.release <- function()
+ {
+   r.majmin <- get.r.majmin()
+   R.toc <- toc("R") # Get R toc
+   R_same.majmin <- grep(paste0("^", r.majmin), R.toc$Version, value = TRUE)
+   R1 <- R_same.majmin[1]
+   #release.date <- subset(R.toc,"Version"==R1)$Published
+   release.date <- R.toc[R.toc$Version==R1,]$Published
+   return(release.date)
+    }
+
+
+  
+ 

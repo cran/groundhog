@@ -5,6 +5,8 @@
 
 <!-- badges: start -->
 
+[![CRAN
+version](https://www.r-pkg.org/badges/version-ago/groundhog)](https://cran.r-project.org/package=groundhog)
 [![R build
 status](https://github.com/CredibilityLab/groundhog/workflows/R-CMD-check/badge.svg)](https://github.com/CredibilityLab/groundhog/actions)
 [![Codecov test
@@ -13,11 +15,10 @@ coverage](https://codecov.io/gh/CredibilityLab/groundhog/branch/master/graph/bad
 
 ## Installation
 
-groundhog has not yet been released on CRAN and must be installed from
-our custom repository:
+groundhog in on CRAN, but the newest version is available from:
 
 ``` r
-install.packages("groundhog", repos = "https://cran.groundhogr.com")
+install.packages("https://groundhogr.com/groundhog_1.1.0.tar.gz", repos=NULL, type='source')
 ```
 
 ## Example 1 - Recovering broken code with backwards incompatible change in dplyr

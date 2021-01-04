@@ -7,7 +7,8 @@
 check.mismatch.R(date)
 }
 \arguments{
-\item{date}{date (in the format "\%Y-\%m-\%d"), Required date for the package.}
+\item{date}{character string  (yyyy-mm-dd), or date value, with the date which determines the
+version of the package, and all dependencies, to be loaded (and installed if needed).}
 }
 \description{
 Warn if there is a mismatch between the current and required \R version

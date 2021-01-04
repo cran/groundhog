@@ -8,7 +8,8 @@
 #' @return a `data.frame` where each row corresponds to one version of `pkg`.
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
+#' toc("R")
 #' toc("magrittr")
 #' }
 #'
@@ -32,8 +33,7 @@ toc <- function(pkg, dependencies = FALSE) {
       "There is no package '", pkg, "' in our database of all CRAN packages ever posted.\n",
       "   Keep in mind that:\n",
       "    1. package names are cAsE seNsiTive\n",
-      "    2. The package name needs to be in quotes: e.g., toc('groundhog') \n",
-      "    3. Only CRAN packages can be loaded via groundhog"
+      "    2. Only CRAN packages can be loaded via groundhog (not github or bioconductor)"
     )
     exit()
   }

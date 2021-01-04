@@ -1,18 +1,13 @@
 #' Generates dataframe with all dependencies needed to install a package, with version and source of installation
 #'
-#' @inheritParams get.all.dependencies
-#' @param force.source Logical (defaults to `FALSE`). If `TRUE`,` will skip CRAN
-#'   and MRAN attempts, download tar.gz, and install from it.
-#' @param current.deps Character or character vector listing packages that will
-#'   be loaded/installed based on the date when the version of \R being used was
-#'   released, rather than the value of `date`.
-#'
+#' @inheritParams groundhog.library
+
 # @examples
 # \dontrun{
-# groundhog:::get.snowball("magrittr", "2018-02-12", current.deps = NULL)
+# groundhog:::get.snowball("magrittr", "2018-02-12")
 # }
 #'
-get.snowball <- function(pkg, date, include.suggests = FALSE, force.source = FALSE, current.deps) {
+get.snowball <- function(pkg, date, include.suggests = FALSE, force.source = FALSE) {
 
   # 1) Get dependencies
   dep12 <- get.all.dependencies(pkg, date, include.suggests = include.suggests)
@@ -24,7 +19,7 @@ get.snowball <- function(pkg, date, include.suggests = FALSE, force.source = FAL
   # Do until all dependencies have been assigned an order (so dep12 is empty)
   while (nrow(dep12) > 0) {
     k <- k + 1
-    indep.rows <- !(dep12$dep2 %in% dep12$pkg) ## Find dependecies without dependencies  TRUE/FALSE vector
+    indep.rows <- !(dep12$dep2 %in% dep12$pkg) ## Find dependencies without dependencies  TRUE/FALSE vector
     # Add those dependencies to the list of independencies
     indepk <- unique(as.character(dep12$dep2[indep.rows]))
     indep <- c(indep, indepk)
@@ -35,12 +30,11 @@ get.snowball <- function(pkg, date, include.suggests = FALSE, force.source = FAL
       break
     }
   }
-
   # 3) Add pkg at the end
   snowball.pkg <- c(indep, pkg)
 
   # 4) Get the version of each package
-  snowball.vrs <- vapply(snowball.pkg, get.version, date, current.deps = current.deps, FUN.VALUE = character(1)) # current.deps replaces the version of those dep with the version that's current when installing
+  snowball.vrs <- vapply(snowball.pkg, get.version, date, FUN.VALUE = character(1)) 
   snowball.pkg_vrs <- paste0(snowball.pkg, "_", snowball.vrs)
 
   # 5 Snowball table, with installed | CRAN | MRAN | TARBALL | INSTALLATION TIME
@@ -72,11 +66,13 @@ get.snowball <- function(pkg, date, include.suggests = FALSE, force.source = FAL
     )
   }
 
-  if (max(toc("R")$Version) == get.rversion()) {
+  
+  
+  #if (max(toc("R")$Version) == get.rversion()) {
     snowball.CRAN <- snowball.pkg_vrs %in% get.current.packages("binary")$pkg_vrs
-  } else {
-    snowball.CRAN <- rep_len(FALSE, length(snowball.pkg_vrs))
-  }
+  #} else {
+  #  snowball.CRAN <- rep_len(FALSE, length(snowball.pkg_vrs))
+  #}
   snowball.MRAN.date <- as.Date(sapply(snowball.pkg_vrs, get.date.for.install.binary), origin = "1970-01-01") # 5.3 Binary date in MRAN?
   snowball.MRAN.date <- as.DateYMD(snowball.MRAN.date)
 
@@ -108,6 +104,7 @@ get.snowball <- function(pkg, date, include.suggests = FALSE, force.source = FAL
     "installation.path" = snowball.installation.path,
     stringsAsFactors = FALSE
   )
+
 
   return(snowball)
 }

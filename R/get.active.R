@@ -10,7 +10,7 @@
 #' }
 #'
 # @examples
-# \donttest{
+# \dontrun{
 # groundhog:::get.active()
 # }
 #'
@@ -31,3 +31,5 @@ get.active <- function() {
   names(df) <- c("pkg", "pkg_vrs")
   df
 }
+
+

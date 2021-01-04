@@ -11,7 +11,7 @@
 #'   the version on CRAN at `date.`
 #'
 # @examples
-# \donttest{
+# \dontrun{
 # groundhog:::get.dependencies("magrittr", "2018-02-12", include.suggests = TRUE)
 # }
 #'
@@ -49,7 +49,7 @@ get.dependencies <- function(pkg, date, include.suggests = FALSE) {
   # safe side
   dep <- dep[dep != ""] # drop empty values
   dep <- dep[dep != "R"] # drop R as a dependency
-  dep <- dep[is.na(dep)] # drop NA
+  dep <- dep[!is.na(dep)] # drop NA
 
   return(dep)
 } # End get.dependencies()
@@ -66,7 +66,7 @@ get.dependencies <- function(pkg, date, include.suggests = FALSE) {
 #'   package in column `pkg`.
 #'
 # @examples
-# \donttest{
+# \dontrun{
 # groundhog:::get.all.dependencies("magrittr", "2018-02-12", include.suggests = TRUE)
 # }
 #'
@@ -97,22 +97,20 @@ get.all.dependencies <- function(pkg, date, include.suggests = FALSE) {
 
     # 5.5 Drop depk from pending
     pending <- pending[-match(depk, pending)]
+    
+    #5.6 Add new pairs to  dep12 
+      if (length(pendingk) > 0) {
+        dep12k <- data.frame(pkg = depk, dep2 = pendingk)
+        dep12 <- rbind(dep12, dep12k)
+        }
 
-    # 5.6 if pendingk not empty, update pending and dep12
+    #5.7 Add new dependencies to pending 
     if (length(pendingk) > 0) {
-      # [a] Process pendingk prior to adding to pending()
-      # Already processed dropped
       already.processed <- pendingk %in% dep12[, 1] # identify in pending those already processed
       pendingk.net <- pendingk[!already.processed] # drop them
-      pending <- unique(c(pending, pendingk.net)) # Unique so that if we add somethign already pending we don't add it
-
-      # Add pendingk.net to dep12 if any
-      if (length(pendingk.net) > 0) {
-        dep12k <- data.frame(pkg = depk, dep2 = pendingk.net)
-        dep12 <- rbind(dep12, dep12k)
-      }
+      pending <- unique(c(pending, pendingk.net)) # Unique so that if we add something already pending we don't add it
     } # End 5.5 if some new dependencies to add
-
+    
     k <- k + 1
     if (k > 50000) break # In case the loop does not converge to a stable dataframe
   } # End while
