@@ -1,6 +1,6 @@
 Package: groundhog
 Title: Reproducible Scripts via Version-Specific Package Loading
-Version: 1.1.0
+Version: 1.2.0
 Authors@R: c(
     person(given = "Uri",
            family = "Simonsohn",
@@ -29,9 +29,9 @@ LazyData: true
 RoxygenNote: 7.1.1
 Suggests: rstudioapi
 NeedsCompilation: no
-Packaged: 2021-01-04 10:41:28 UTC; Uri
+Packaged: 2021-01-14 15:37:32 UTC; Uri
 Author: Uri Simonsohn [aut, cre] (<https://orcid.org/0000-0002-8601-7211>),
   Hugo Gruson [ctb, aut] (<https://orcid.org/0000-0002-4094-1476>)
 Maintainer: Uri Simonsohn <urisohn@gmail.com>
 Repository: CRAN
-Date/Publication: 2021-01-04 13:00:03 UTC
+Date/Publication: 2021-01-14 20:50:02 UTC

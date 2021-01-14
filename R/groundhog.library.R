@@ -16,7 +16,7 @@
 #'   the R session to unload all packages. This will bypass that requirement.
 #'@param force.source logical (defaults to `FALSE`). When set to `TRUE`, will not attempt 
 #'   installing binary from CRAN or MRAN and instead download source file and install it.
-#'@param force.install logical (defaults to `FALSE`). When set to `TRUE`, will deleted  
+#'@param force.install logical (defaults to `FALSE`). When set to `TRUE`, will delete  
 #'   existing package files in groundhog folder, and install anew.
 #'@return a character vector containing all active packages for the session,
 #'   with their version number, under the format `pkg_vrs`.
@@ -38,6 +38,54 @@
                               force.source = FALSE,
                               force.install = FALSE) {
 
+    
+    
+  #0) Validate date
+      # numeric
+        bad.date <- 0
+         if (is.numeric(date)) {
+          bad.date <- 1
+        }
+ 
+      # correct format
+        d <- try(as.Date(date, format="%Y-%m-%d"))
+          if("try-error" %in% class(d) || is.na(d)) {
+            bad.date <- 1
+          }
+            
+      #If bad date die 
+          if (bad.date==1) {
+            message(
+                "\ngroundhog.library() error.\n",
+                "The date you entered '", date,"', is not valid.\n",
+                "Please use the 'yyyy-mm-dd' format"
+                  )
+            exit()
+            }
+    
+  #0.5) If pkg is a vector, loop over it
+    if (exists(as.character(substitute(pkg))) && is.vector(pkg) && length(pkg)>1) {
+        #Check first that "pkg" has been defined in the environment
+        #If it has check that it is a vector
+        #If it is, and has more than 1 element, loop
+      
+          for (pkgk in pkg)
+            {
+            pkgk.character <- as.character(pkgk)
+            exec_line <- paste0("groundhog.library('", pkgk, "', '" , 
+                         date, "'," , 
+                         quiet.install, "," ,
+                         include.suggests, "," , 
+                         ignore.deps, "," , 
+                         force.source, "," , 
+                         force.install,")")
+              eval(parse(text=exec_line))  
+            }
+              exit()
+            }
+      
+    
+    
   # If package name was given using non-standard evaluation (i.e., unquoted)
   pkg <- as.character(substitute(pkg))
 
@@ -101,10 +149,17 @@
           #How long since last warning?
             since_warning <- 25  #assume 25 hours, i.e., show warnings
             if (file.exists(cookie_path)) since_warning <- difftime(Sys.time(),file.info(cookie_path)$ctime,units='hours')
+			
             
           #If >24 show warnings
           if (since_warning>24)
           {
+          #Update cookie to indicate warning has been shown now
+            unlink(cookie_path)
+            write("1",cookie_path)
+            
+          #Show warning
+
           message2()
           message1(
             "You are using R-", rv$r.using.full, ", but on (","'", date, "') the current version was R-", rv$r.need.majmin, ".\n",
@@ -112,13 +167,12 @@
             "work at all. You may want to either change the date you entered, or the version of R you use.\n",
             " - To change a date, choose something after '",get.r.majmin.release(),"'\n",
             " - Or use R-",rv$r.need.full, "  (instructions for running older R versions: http://groundhogr.com/many)\n\n")
-          message1("Type 'OK' to continue anyway")
+          message1("Type 'OK' to continue anyway, type anything else to stop.")
           text <- readline()
             
           #If they press stop, don't load/install package
             if (text!='ok' & text!="OK" & text!="'ok'") {
-              message("You did not type OK, so it stopped.")
-              message("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+              message("You did not type OK, so installation has stopped.")
               exit()
               }
             message1("OK. We will continue. This warning will not be shown again within 24 hours")
@@ -205,8 +259,8 @@
                   {
                   
                   message("groundhog says: WARNING, loaded unexpected version of '", pkg, "'\n",
-                         "expected: ''", pkg_vrs, "\n",
-                         "loaded  : ''", pkg_vrs, "\n"
+                         "expected: '", pkg_vrs, "'\n",
+                         "loaded  : '", active$pkg_vrs, "'\n"
                     )
                   }
     if (pkg_vrs %in% loaded_pkg_vrs) {
