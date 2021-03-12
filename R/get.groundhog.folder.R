@@ -1,10 +1,9 @@
-  #' Get groundhog folder location
+#' Get current local path to groundhog folder
 #'
 #' @return the path to the groundhog folder, the meta-library where 
-#'   [groundhog.library()] downloads and stores binaries and source files 
+#'   [groundhog.library()] downloads and stores packages that can be loaded 
 #'
-#' @note you can change the location of this folder by editing the environment
-#'   variable GROUNDHOG_FOLDER. In R, you can do this with the command
+#' @note you can change the location of this folder with the command
 #'   `set.groundhog.folder("path")`.
 #' 
 #' @examples
@@ -50,7 +49,7 @@ get.groundhog.folder <- function() {
           }
     
   #Create main folder 
-    dir.create(main_folder, showWarnings = FALSE, recursive = TRUE)
+      dir.create(main_folder, showWarnings = FALSE, recursive = TRUE)
 
   #Path to cookie file with location of folder
     path_file_storing_groundhog_library_location <- paste0(main_folder ,"/current_groundhog_folder.txt")
@@ -80,10 +79,7 @@ get.groundhog.folder <- function() {
 #' @param path Character. The path to the groundhog folder containing the library
 #'   where packages are downloaded and installed.
 #'
-#' @note This setting can also be achieved by manually editing the `.Renviron`
-#'   file. You can set this globally by editing `~/.Renviron` or only for a
-#'   specific project by editing the `.Renviron` file at the root of your
-#'   project.
+
 #'
 #' @examples
 #' \dontrun{
@@ -112,4 +108,7 @@ set.groundhog.folder <- function(path) {
   
   #Assign it to the live environment
     Sys.setenv(GROUNDHOG_FOLDER = path)
+    
+  #Show message
+    message1("The groundhog folder path is now:\n",path)
     }

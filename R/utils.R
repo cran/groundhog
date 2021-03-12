@@ -2,17 +2,16 @@
 get.pkg <- function(x) substr(x, 1, regexpr("_", basename(x)) - 1)
 get.vrs <- function(x) substr(x, regexpr("_", basename(x)) + 1, nchar(x))
 
-#' Is pkg_vrs installed (within same R-minor version)?
-#'
-#' @inheritParams get.installed_path
+# Is pkg_vrs installed (within same R-minor version)?
+#
 is.pkg_vrs.installed <- function(pkg, vrs) {
   (get.installed_path(pkg, vrs) %in% get.pkg_search_paths(pkg, vrs))
 }
 
-#' Format Y-M-D as date
-#'
-#' @param x character string containing the date in the format "%Y-%m-%d"
-#'
+# Format Y-M-D as date
+#
+# @param x character string containing the date in the format "%Y-%m-%d"
+#
 as.DateYMD <- function(x) as.Date(x, format = "%Y-%m-%d",origin='1970-01-01')
 
 # 2.2  R Being used
@@ -149,6 +148,30 @@ base_pkg <- function() {
   )
 }
 
+#Default pacakges to ignore conflicts with (but gives warning)
+ignore.deps_default <- function() {
+  
+  #Packages r-studio tends to load automatically
+      Rstudio.deps <- c("testthat", 
+        "rstudioapi",
+        "knitr",     
+        "rmarkdown", 
+        "xfun"       
+        )
+  
+  #Recommended and thus hard to uninstall packages
+      ip <- data.frame(utils::installed.packages(),stringsAsFactors = FALSE)
+      recommended.pkgs <- unique(subset(ip, ip$Priority=="recommended")$Package) #unique becuase there may be two versions of the same package in different libraries
+      
+  #Combine
+      ignore.deps <- c(Rstudio.deps, recommended.pkgs)
+    
+  #Return
+      return(ignore.deps)
+           
+    }
+
+
 
 
 is_rstudio <- function() {
@@ -174,11 +197,35 @@ get.r.majmin <- function() {
    R.toc <- toc("R") # Get R toc
    R_same.majmin <- grep(paste0("^", r.majmin), R.toc$Version, value = TRUE)
    R1 <- R_same.majmin[1]
-   #release.date <- subset(R.toc,"Version"==R1)$Published
    release.date <- R.toc[R.toc$Version==R1,]$Published
    return(release.date)
     }
 
-
-  
  
+	
+ 
+  #Function to validate date  
+  validate.date <- function(date)
+      {
+      # numeric
+        bad.date <- 0
+         if (is.numeric(date)) {
+          bad.date <- 1
+        }
+ 
+      # correct format
+        d <- try(as.Date(date, format="%Y-%m-%d"))
+          if("try-error" %in% class(d) || is.na(d)) {
+            bad.date <- 1
+          }
+            
+      #If bad date die 
+          if (bad.date==1) {
+            message(
+                "\ngroundhog says: error!\n",
+                "The date you entered '", date,"', is not valid.\n",
+                "Please use the 'yyyy-mm-dd' format"
+                  )
+            exit()
+          }
+  }#End is valid date

@@ -1,20 +1,5 @@
-#' Get date of binary package from MRAN, given \R version being used
-#'
-#' @param pkg_vrs character. The required package and its version separated by
-#'   an underscore.
-#' @param R_vrs character. The required \R version.
-#'
-#' @return the date of the binary the download from MRAN, in the format
-#'   "%Y-%m-%d".
-#'
-#' @seealso [get.version()] for the opposite operation: determining the package
-#'   version from a given date.
-#'
-# @examples
-# \dontrun{
-# groundhog:::get.R.pkg.date("magrittr_1.0.1", "3.6.0")
-# }
-#'
+# Get date of binary package from MRAN, given \R version being used
+#
 get.R.pkg.date <- function(pkg_vrs, R_vrs) {
   if (is.null(.pkgenv[["cran.toc"]])) {
     load.cran.toc()
@@ -111,13 +96,3 @@ get.R.pkg.date <- function(pkg_vrs, R_vrs) {
   return(mid.date)
 }
 
-
-
-# Function addded on 2020 05 06
-#' @importFrom utils available.packages contrib.url
-get.mran.version <- function(pkg, date) {
-  repok <- paste0("https://mran.microsoft.com/snapshot/", date)
-  ap <- as.data.frame(available.packages(contrib.url(repos = repok), type = "binary"))
-  version <- as.character(ap$Version[ap$Package == pkg])
-  return(version)
-}

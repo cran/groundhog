@@ -10,7 +10,7 @@ get.current.packages <- function(type) {
       {
       filek_path <- paste0(main_folder , filek)             #full path to file
       pos.ap_file <- regexpr('available_packages', filek)   #>0 if file contains the words available_packages
-      age <- as.numeric(difftime(Sys.time() , file.mtime(filek_path),units='mins'))
+      age <- as.numeric(difftime(Sys.time() , file.info(filek_path)$mtime,units='mins'))
       if (pos.ap_file>0 & age>60) unlink(filek_path)        #Delete available_package files older than 60 minutes
     }
     
@@ -21,14 +21,21 @@ get.current.packages <- function(type) {
   #Else get available packages to see if each attempted to install is new
       current.packages <- tryCatch({
           as.data.frame(
-          available.packages(contriburl = contrib.url(repos = "https://cloud.r-project.org/", type = type))[, c(1, 2)],
+          utils::available.packages(contriburl = utils::contrib.url(repos = "https://cloud.r-project.org/", type = type))[, c(1, 2)],
           stringsAsFactors = FALSE
         )},
         error = function(e) NULL)
+		
         if (is.null(current.packages)) {
-        exit("Cannot install packages, connection to CRAN server failed. Perhaps you are offline?")
+			#Make empty available pacakges if offline or if older version of R being used to current packages is not available.	
+			current.packages <- data.frame(Package="", Version="")
+			
         }
-        current.packages$pkg_vrs <- paste0(current.packages$Package, "_", current.packages$Version)
+	#If current packages is not empty, create pkg_vrs for it
+        if (nrow(current.packages)>0) {
+			current.packages$pkg_vrs <- paste0(current.packages$Package, "_", current.packages$Version)
+			}
+			
         saveRDS(current.packages, ap_file_path)
     } #End if file found
     

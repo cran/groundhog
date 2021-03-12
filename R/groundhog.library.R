@@ -1,6 +1,6 @@
 #' Install packages as available on set date -  groundhog.library()
 #'
-#'@param pkg character string with name of target package to load (and install if needed), 
+#'@param pkg character string or vector with name of target package(s) to load (and install if needed), 
 #'need not be in quotes.
 #'@param date character string  (yyyy-mm-dd), or date value, with the date which determines the 
 #'version of the package, and all dependencies, to be loaded (and installed if needed).
@@ -20,10 +20,12 @@
 #'   existing package files in groundhog folder, and install anew.
 #'@return a character vector containing all active packages for the session,
 #'   with their version number, under the format `pkg_vrs`.
-#'
-#' @examples
+#'@examples
 #' \dontrun{
-#' groundhog.library("magrittr", "2018-02-12")
+#' groundhog.library("magrittr", "2020-07-12")
+#'
+#' pkgs <- c('pwr','metafor')
+#' groundhog.library(pkgs, "2020-02-12")
 #' }
 #'
 #' @importFrom utils capture.output
@@ -40,35 +42,19 @@
 
     
     
-  #0) Validate date
-      # numeric
-        bad.date <- 0
-         if (is.numeric(date)) {
-          bad.date <- 1
-        }
- 
-      # correct format
-        d <- try(as.Date(date, format="%Y-%m-%d"))
-          if("try-error" %in% class(d) || is.na(d)) {
-            bad.date <- 1
-          }
-            
-      #If bad date die 
-          if (bad.date==1) {
-            message(
-                "\ngroundhog.library() error.\n",
-                "The date you entered '", date,"', is not valid.\n",
-                "Please use the 'yyyy-mm-dd' format"
-                  )
-            exit()
-            }
+  #0.1) Is date valid?
+        validate.date(date) #Function defined in utils.R
     
+  #0.4) Set of ignorable conflicts
+        ignore.deps <- c(ignore.deps_default() , ignore.deps) #Add any ignore.deps explicitly stated to the default set in utils
+        
+        
   #0.5) If pkg is a vector, loop over it
     if (exists(as.character(substitute(pkg))) && is.vector(pkg) && length(pkg)>1) {
         #Check first that "pkg" has been defined in the environment
         #If it has check that it is a vector
         #If it is, and has more than 1 element, loop
-      
+           
           for (pkgk in pkg)
             {
             pkgk.character <- as.character(pkgk)
@@ -76,27 +62,31 @@
                          date, "'," , 
                          quiet.install, "," ,
                          include.suggests, "," , 
-                         ignore.deps, "," , 
+                         "'", paste0(ignore.deps, collapse=','), "'," , 
                          force.source, "," , 
                          force.install,")")
               eval(parse(text=exec_line))  
-            }
-              exit()
-            }
+              
+            } 
+      } else  {
+            
+            
       
     
     
   # If package name was given using non-standard evaluation (i.e., unquoted)
-  pkg <- as.character(substitute(pkg))
+    pkg <- as.character(substitute(pkg))
 
   
-  #1 initial check,  stop if same version
+    #1.0 initial check,  stop if same version
       active=get.active()
+      
   
     #1.1 Get version of requested package
         vrs <- get.version(pkg, date)
         pkg_vrs <- paste0(pkg, "_", vrs)
         
+
     #1.2 Stop if  pkg_vrs already attached
         attached.list=utils::sessionInfo()$otherPkgs
         attached.pkg <- names(attached.list)
@@ -104,11 +94,13 @@
         attached.pkg_vrs <- paste0(attached.pkg, "_", attached.vrs) 
         
         if (pkg_vrs %in% attached.pkg_vrs) {
-            message1("groundhog says: the package you requested ('", pkg, "_", vrs, "') is already attached")
+            message1("groundhog says: the package you requested ('", pkg_vrs, "') is already attached.")
             return(invisible(active$pkg_vrs))
-
+            
         }
-    #1.3 Attach if package is loaded but not attached
+
+  
+    #1.2.5 Attach if package is loaded but not attached
         if (pkg_vrs %in% active$pkg_vrs)
         {
           attachNamespace(pkg)
@@ -116,8 +108,73 @@
           return(invisible(active$pkg_vrs))
 
         }
-      
- 
+   
+   #1.3 Mismatched package already attached  
+         if ((pkg %in% attached.pkg) &  (!pkg_vrs %in% attached.pkg_vrs)) {
+            message1(
+                    "groundhog says: another version of '", pkg,"' is already attached ('", active$pkg_vrs[active$pkg==pkg],"').\n",
+                    "To solve this: restart the R session. Note: you will need to do 'library(groundhog)' again.\n\n",
+                    "In R Studio press: CTRL/CMD-SHIFT-F10"
+                    )
+          message("\nThe package '", pkg_vrs,"' was *NOT* attached")
+          return(invisible(active$pkg_vrs))
+         }
+        
+        
+    #1.4 Mismatched package already loaded, and not one of the ignore.deps  
+        #  if ((pkg %in% active$pkg) &  (!pkg_vrs %in% active$pkg_vrs) & (!pkg %in% ignore.deps)) {
+        #     message1(
+        #             "groundhog says: another version of '", pkg,"' is already loaded ('", active$pkg_vrs[active$pkg==pkg],"').\n",
+        #             "To solve this: restart the R session. Note: you will need to do 'library(groundhog)' again.\n\n",
+        #             "In R Studio press: CTRL/CMD-SHIFT-F10"
+        #             )
+        #   message("\nThe package '", pkg_vrs,"' was *NOT* attached")
+        #   return(invisible(active$pkg_vrs))
+        # }
+        
+        
+    #1.5 Attach mismatched version if ignore.deps is loaded but not attached (common scenario, trying to attach knitr in .rmd file)
+       if ((pkg %in% active$pkg) & (!pkg_vrs %in%  active$pkg_vrs) & (pkg %in% ignore.deps))
+        {
+         #Recommended
+             ip <- data.frame(utils::installed.packages(),stringsAsFactors = FALSE)
+             recommended.pkgs <- unique(subset(ip, ip$Priority=="recommended")$Package) #unique becuase there may be two versions of the same package in different libraries
+         
+          attachNamespace(pkg)
+          message1("groundhog says: succesfully attached '" , pkg , "'")
+          message("\ngroundhog warning:\n", 
+                   "'", pkg, "' was already loaded, and it is now attached,\n",
+                  "BUT the loaded version ('" , active$pkg_vrs[active$pkg==pkg] , "') does not match the version for ",
+                   "'" , date, "' ('", pkg_vrs , "').\n",
+                  "To attach the desired version you can try restarting the R session.\n\n",
+                  "In R Studio press: CTRL/CMD-SHIFT-F10\n\n",
+                  "Note that it is possible that this package is being loaded automatically from your local\n",
+                  "library. In this case, after restarting the session the problem will persist.\n",
+                  "You can ignore this problem and tolerate lack of version control for the involved packages.\n", 
+				  "You can also prevent this problem by uninstalling the package from your non-groundhog library\n",
+				  "running: remove.packages('", pkg ,"'), but if R Studio is using the package (e.g., the\n",
+				  "'knit' button requires 'knitr' outside of groundhog), you may need to rely on R rather than\n",
+				  "R Studio for that disabled functionality."
+				 )
+		
+          
+        #Explain the recommended issue if appropriate
+          if (pkg %in% recommended.pkgs) {
+              message(
+                    "The package in question '", pkg , "', is a 'recommended' package which makes removing it from the\n",
+                    "local (non-groundhog) library potentially more problematic; this is why this conflict\n",
+                    "is tolerated by groundhog, producing a warning rather than an error."
+                    )
+            }
+          return(invisible(active$pkg_vrs))
+
+        }   
+        
+        
+        
+        
+        
+        
   # Check if using R that's from a version PRIOR to that current for the desired date (prior to current release)
   # e.g., using R-3.3.3 for "2020-01-05"
 
@@ -148,9 +205,8 @@
         
           #How long since last warning?
             since_warning <- 25  #assume 25 hours, i.e., show warnings
-            if (file.exists(cookie_path)) since_warning <- difftime(Sys.time(),file.info(cookie_path)$ctime,units='hours')
-			
-            
+            if (file.exists(cookie_path)) since_warning <- difftime(Sys.time(),file.info(cookie_path)$mtime,units='hours')
+			      
           #If >24 show warnings
           if (since_warning>24)
           {
@@ -167,7 +223,7 @@
             "work at all. You may want to either change the date you entered, or the version of R you use.\n",
             " - To change a date, choose something after '",get.r.majmin.release(),"'\n",
             " - Or use R-",rv$r.need.full, "  (instructions for running older R versions: http://groundhogr.com/many)\n\n")
-          message1("Type 'OK' to continue anyway, type anything else to stop.")
+          message2("--->>> Type 'OK' to continue anyway, type anything else to stop. <<<---")
           text <- readline()
             
           #If they press stop, don't load/install package
@@ -188,32 +244,34 @@
           
           
 
-  #3 Grab .libpaths()
-    orig_lib_paths <- .libPaths()
-    .libPaths("")  #actively remove default library path
-    on.exit(.libPaths(orig_lib_paths))
+  #3 Reset .libpaths()
+    #Get original
+      orig_lib_paths <- .libPaths()
+      
+    #Assign package variable to be available in snowball conflict check (to see if a conflict is caused by local library)
+      .pkgenv[["orig_lib_paths"]] <- orig_lib_paths
+
+      
+    #actively remove default library path
+	    .libPaths("")  
+      on.exit(.libPaths(orig_lib_paths))
 
   #4 Update cran.toc() if needed for entered date 
     update_cran.toc_if.needed(date)
 
-  #5 Get vrs
-    vrs <- get.version(pkg, date)
-    pkg_vrs <- paste0(pkg, "_", vrs)
-
-  #6 GET SNOWBALL
+ 
+  #5 GET SNOWBALL
     snowball <- get.snowball(pkg, date, 
                              include.suggests=include.suggests, 
                              force.source=force.source)
     
 
 
-  #7 CHECK FOR CONFLICT SNOWBALL <->ACTIVE PACKAGES
+  #6 CHECK FOR CONFLICT SNOWBALL <->ACTIVE PACKAGES
       check.snowball.conflict(snowball, force.install,ignore.deps,date)  
     
-      
-    
 
-  #8 message if installation will be necessary
+  #7 message if installation will be necessary
     need.to.install.total <- sum(!snowball$installed)
     if (need.to.install.total > 0) {
       message2()
@@ -221,10 +279,9 @@
         "Loading ", pkg_vrs, " requires loading ", nrow(snowball), " packages, of which ",
         need.to.install.total, " will need to be installed."
               )
-      
-
-  }
-  #9 Install packages if needed
+    }
+    
+  #8 Install packages if needed
   
   install.snowball(snowball, 
     date=date,
@@ -233,14 +290,36 @@
     quiet.install = quiet.install
     )
   
+  #9 --- dropped
+  
   #10 Load packages & attach the requested package
-    n=nrow(snowball)
-   for (k in 1:n)
-    {
-    .libPaths(c(.libPaths(), snowball$installation.path[k] ))
-    loadNamespace(snowball$pkg[k], lib.loc = snowball$installation.path[k])
-    if (k==n)   attachNamespace(snowball$pkg[k])
-  }
+   n <- nrow(snowball)
+   
+   #10.1 Load the cran.toc
+      cran.toc <- .pkgenv[["cran.toc"]]
+      cran.toc.snowball <- cran.toc [paste0(cran.toc$Package,"_",cran.toc$Version) %in% snowball$pkg_vrs, ]
+      
+   #10.2 Get the needed DEPEND dependencies so that they are attached
+      attach.all <- unique(unlist(strsplit(cran.toc.snowball$Depends, ",")))
+
+      
+   #10.3 Attach ?
+       for (k in 1:n)
+        {
+        attached.so_far <- names(utils::sessionInfo()$otherPkgs)
+        .libPaths(c(.libPaths(), snowball$installation.path[k] ))
+        loadNamespace(snowball$pkg[k], lib.loc = snowball$installation.path[k])
+        if (
+             snowball$pkg[k] %in% attach.all & 
+            !snowball$pkg[k] %in% attached.so_far
+            ) 
+          {
+          attachNamespace(snowball$pkg[k])
+          message1("Attaching ",snowball$pkg[k])
+          }
+        
+        if (k==n) attachNamespace(snowball$pkg[k])
+        }
 
   #11 Success/failure message
     #11.1 look at loaded packages
@@ -255,24 +334,20 @@
       
         #Unexpected version loaded
             loaded_pkg_vrs <- active[active$pkg==pkg,]$pkg_vrs
-            if ((pkg %in% active$pkg) & (!pkg_vrs %in% active$pkg_vrs)) 
+            if ((pkg %in% active$pkg) & (!pkg_vrs %in% active$pkg_vrs) & (!pkg %in% ignore.deps))
                   {
-                  
                   message("groundhog says: WARNING, loaded unexpected version of '", pkg, "'\n",
                          "expected: '", pkg_vrs, "'\n",
-                         "loaded  : '", active$pkg_vrs, "'\n"
+                         "loaded  : '", active$pkg_vrs[active$pkg %in% pkg], "'\n"
                     )
                   }
     if (pkg_vrs %in% loaded_pkg_vrs) {
-      message1("groundhog says: successfully loaded '", pkg_vrs,"'.")
+      message1("groundhog says: successfully attached '", pkg_vrs,"'.")
         } else {
         
       }
-
-      
-      
     
   #12 output
     invisible(loaded_pkg_vrs)
   }
-
+}#ENd elseif
