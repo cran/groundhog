@@ -160,17 +160,41 @@ check.snowball.conflict <- function(snowball, force.install, ignore.deps, date) 
                       }
                   
           #2) If the package is removable, suggest removing it 
-                  if (sum(remove.set)>0)  
-                    {
-                      message(msg.repeat.conflict.uninstall)
-                      text.answer <-readline(prompt = "To unistall conflicting packages type 'uninstall'. Type anything else to turn this solution down >")
-                      if (tolower(text.answer)=="uninstall") remove.conflict(conflict.active)
-                      if (tolower(text.answer)!="uninstall") message("You typed '", text.answer, "', which is != 'uninstall', so will NOT uninstall conflicts.")
-                  }
-                  exit()
-              }
+               if (sum(remove.set)>0)  
+                  {
+                  message(msg.repeat.conflict.uninstall)
+                      
+                  #While loop for readline to avoid submitted code to be interpreted as the answer
+        						text <-''
+        						j <- 1 #counter of times message is shown
+        						while (text!="uninstall" & text !="keep")  
+        						{
+        						text <- readline(prompt = "To unistall conflicting packages type 'uninstall', to keep them type 'keep' >")
+        						text <- strip.prompt(text)
+        						if (text !="uninstall" & text != "keep") {
+        						message(j , ") You answered: '", text , "'") 
+        						message("   To ensure you are actively answering, only 'uninstall' and 'keep' are accepted as responses\n")
+        						j<-j+1 #Add to counter of msgs rejected
+        						} #end if
+                    } #End while
+									
+					
+					#If they typed uninstall, do it
+                  if (text=="uninstall") {
+                    remove.conflict(conflict.active)
+                  } 
+                      
+           #if they typed keep
+                  if (text == "keep") {
+					          message("You typed 'keep', will NOT uninstall conflicts.")
+					        }
+					  
+						
+						exit()
+               }
+        }
       
-         
+           
   #9 Warning about ignored conflicts, if all conflicts were ignored
        #9.1 Find Packages with a conflict that is being ignored
             conflict.ignored    <- snowball$pkg_vrs[!(snowball$pkg_vrs %in% active$pkg_vrs) & (snowball$pkg %in% active$pkg) & (snowball$pkg  %in% ignore.deps_default())]

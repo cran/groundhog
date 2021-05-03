@@ -2,10 +2,16 @@
 # Example
 # groundhog:::get.version("magrittr", "2018-02-12")
 
-get.version <- function(pkg, date, patch = c("current", "max")) {
+get.version <- function(pkg, date, patch = c("current")) {
 
-  patch <- match.arg(patch)
-
+  #if it is a base package, return the installed version
+    if (pkg %in% base_pkg()) {
+        ip.base     <- data.frame(utils::installed.packages(priority="base"), stringsAsFactors = FALSE)    
+        ip.base.pkg <- ip.base[ip.base$Package == pkg,]
+        return(ip.base.pkg$Version)
+        }
+    
+  
   # 1. Get toc
     dfk <- toc(pkg)
     cran.toc <- .pkgenv[["cran.toc"]]
@@ -13,7 +19,7 @@ get.version <- function(pkg, date, patch = c("current", "max")) {
   # 2.2 Check if date request comes after first date for that package
     if (dfk$Published[1] > date) {
       message2()
-      message1("According to our records, the package: '", pkg, "' was not yet available on CRAN on '", date, "'")
+      message1("According to our records, the package '", pkg, "' was not yet available on CRAN on '", date, "'")
       exit()
     }
     

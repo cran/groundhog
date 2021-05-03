@@ -24,6 +24,12 @@ get.dependencies <- function(pkg, date, include.suggests = FALSE) {
   update_cran.toc_if.needed(date = date)
   cran.toc <- .pkgenv[["cran.toc"]]
 
+  
+  #If a base R package, return empty character vector (cannot lookup in crant.toc.rds for it is not on cran)
+    if (pkg %in% base_pkg()) {
+      return(as.character())
+    }
+  
   # Get version from date
   vrs <- get.version(pkg, date)
 
@@ -34,7 +40,7 @@ get.dependencies <- function(pkg, date, include.suggests = FALSE) {
     dep <- c(dep, row$Suggests) # add 'Suggests' dependencies if requested
   }
   dep <- unlist(strsplit(dep, ","))  # turn to array
-  dep <- dep[!dep %in% base_pkg()]   # base dependencies from R
+  #dep <- dep[!dep %in% base_pkg()]   # base dependencies from R
   dep <- unique(dep)                 # some dependencies can be listed both in Imports and LinkingTo, keep only one
 
   #Drop non-cran
@@ -81,11 +87,11 @@ get.all.dependencies <- function(pkg, date, include.suggests = FALSE) {
   pending <- get.dependencies(pkg, date, include.suggests = include.suggests) # include.suggests=TRUE means that suggested dependencies and their dependencies are installed.
 
   if (length(pending) == 0) {
-    return(data.frame(pkg = character(), dep2 = character()))
+    return(data.frame(pkg = character(), dep2 = character(),stringsAsFactors = FALSE))
   }
 
   # [b] dep12: data.frame with two columns, pkg-left, dependency-right, for snowball loading
-  dep12 <- data.frame(pkg = pkg, dep2 = pending)
+  dep12 <- data.frame(pkg = pkg, dep2 = pending, stringsAsFactors = FALSE)
 
   # 5.2 Loop over pending, adding to dep12, and both adding and subtracting from pending till it's empty
   k <- 1

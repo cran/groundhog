@@ -5,7 +5,12 @@ get.vrs <- function(x) substr(x, regexpr("_", basename(x)) + 1, nchar(x))
 # Is pkg_vrs installed (within same R-minor version)?
 #
 is.pkg_vrs.installed <- function(pkg, vrs) {
-  (get.installed_path(pkg, vrs) %in% get.pkg_search_paths(pkg, vrs))
+  #Assume base package is installed
+  if (pkg %in% base_pkg()) {
+    return(TRUE)
+    } else {
+    (get.installed_path(pkg, vrs) %in% get.pkg_search_paths(pkg, vrs))
+    } #End else
 }
 
 # Format Y-M-D as date
@@ -152,8 +157,9 @@ base_pkg <- function() {
 ignore.deps_default <- function() {
   
   #Packages r-studio tends to load automatically
-      Rstudio.deps <- c("testthat", 
-        "rstudioapi",
+      Rstudio.deps <- c(
+        #"testthat", 
+        #"rstudioapi",
         "knitr",     
         "rmarkdown", 
         "xfun"       
@@ -229,3 +235,18 @@ get.r.majmin <- function() {
             exit()
           }
   }#End is valid date
+  
+  #Clean up prompt asnwer, lowercase and no quotes
+  strip.prompt <- function(x)
+  {
+     x <- gsub('`' ,"", x)
+     x <- gsub('"' ,"", x)
+     x <- gsub("'" ,"", x)
+     x <- tolower(x)
+     x
+     }
+
+  
+  
+    
+    
