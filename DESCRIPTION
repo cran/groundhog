@@ -1,6 +1,6 @@
 Package: groundhog
 Title: The Simplest Solution to Version-Control for CRAN Packages
-Version: 1.4.0
+Version: 1.5.0
 Authors@R: c(
     person(given = "Uri",
            family = "Simonsohn",
@@ -27,9 +27,9 @@ License: GPL-3
 Encoding: UTF-8
 RoxygenNote: 7.1.1
 NeedsCompilation: no
-Packaged: 2021-05-03 09:29:43 UTC; Uri
+Packaged: 2021-09-07 15:34:46 UTC; Uri
 Author: Uri Simonsohn [aut, cre] (<https://orcid.org/0000-0002-8601-7211>),
   Hugo Gruson [ctb, aut] (<https://orcid.org/0000-0002-4094-1476>)
 Maintainer: Uri Simonsohn <urisohn@gmail.com>
 Repository: CRAN
-Date/Publication: 2021-05-03 09:40:02 UTC
+Date/Publication: 2021-09-07 15:50:02 UTC
