@@ -29,7 +29,7 @@ get.groundhog.folder <- function() {
        #If no folder, ask for consent 
          if (consent == FALSE) {
             message2()
-            message1("groundhog needs authorization to save files to  '",main_folder, "'\n",
+            message1("groundhog needs authorization to save files to '",main_folder, "'\n",
                     "Enter 'OK' to provide authorization")
                                   
             answer <- readline()
@@ -107,8 +107,15 @@ set.groundhog.folder <- function(path) {
     path <- trimws(path)
     cat(path, file = path_file_storing_groundhog_library_location)
   
+  #Create groundhog
+    dir.create(path, showWarnings = FALSE, recursive = TRUE)
+
+    
   #Assign it to the live environment
     Sys.setenv(GROUNDHOG_FOLDER = path)
+ 
+  #Load cran toc rds
+    load.cran.toc() #this will copy the rds files
     
   #Show message
     message1("The groundhog folder path is now:\n",path)

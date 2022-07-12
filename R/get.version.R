@@ -8,7 +8,11 @@ get.version <- function(pkg, date, patch = c("current")) {
     if (pkg %in% base_pkg()) {
         ip.base     <- data.frame(utils::installed.packages(priority="base"), stringsAsFactors = FALSE)    
         ip.base.pkg <- ip.base[ip.base$Package == pkg,]
-        return(ip.base.pkg$Version)
+          
+        #if a user has a misconfigured copy of R, they may have two verson of the same base package, take the highest of them 
+          #return(ip.base.pkg$Version) #up to 2021 - 10 - 30
+        
+        return(max(ip.base.pkg$Version))
         }
     
   
@@ -34,7 +38,7 @@ get.version <- function(pkg, date, patch = c("current")) {
           last.toc.date <- max(cran.toc$Published, na.rm = TRUE)
           if (date > last.toc.date) {
             exit(
-                "The index of CRAN pacakges ends on ", last.toc.date,
+                "The index of CRAN packages ends on ", last.toc.date,
                 " which is before the date you entered: ", date, ".\n"
                 )
             

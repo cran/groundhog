@@ -1,70 +1,73 @@
-# Load `cran.toc`
-#
-# Load a `data.frame` listing all CRAN packages, with their dependencies and
-# publication date.
+
+#Load all databases, optional parameter update.toc leads to downloading from groundhogr.com as wasaby as backup
 
 load.cran.toc <- function(update.toc = FALSE) {
-  groundhogR.url <- "http://groundhogR.com/"
-  groundhog.folder <- get.groundhog.folder()
+  
+  #1. URL with rds files
+    groundhogR.url <- "https://groundhogR.com/"
+    wasabi.url     <- "https://s3.wasabisys.com/groundhog/"  
+  
+  
+  #2. Local paths 
+      gf <- get.groundhog.folder()
 
-  # 3.0 Ensure directory for groundhog exists
-  dir.create(groundhog.folder, showWarnings = FALSE) # Create if inexistent
-
-  # 3.1 Paths two databases (toc and times:
-  # LOCAL
-  toc.path <- file.path(groundhog.folder, "cran.toc.rds")
-  times.path <- file.path(groundhog.folder, "cran.times.rds")
-  mran.path <- file.path(groundhog.folder, "missing.mran.dates.rds")
-
-  # 3.2 JUST LOAD
-  if (!update.toc) {
-
-    # TOC
-    if (file.exists(toc.path)) {
-      cran.toc <- readRDS(toc.path)
-    } else {
-      cran.toc <- readRDS(system.file("cran.toc.rds", package = "groundhog"))
-    }
-
-    # Move the cran.toc outside the function space, to global environment
-    .pkgenv[["cran.toc"]] <- cran.toc
-
-    # Times
-    if (file.exists(times.path)) {
-      cran.times <- readRDS(times.path)
-    } else {
-      cran.times <- readRDS(system.file("cran.times.rds", package = "groundhog"))
-    }
-
-    .pkgenv[["cran.times"]] <- cran.times
+    #Ensure directory for groundhog exists
+      dir.create(gf, showWarnings = FALSE, recursive = TRUE) 
+  
+    #Names of files
+      files.rds = c('cran.toc.rds' , 'cran.times.rds' , 'missing.mran.dates.rds' )
 
 
-    # MRAN missing dates
-    if (file.exists(mran.path)) {
-      missing.mran.dates <- readRDS(mran.path)
-    } else {
-      missing.mran.dates <- readRDS(system.file("missing.mran.dates.rds", package = "groundhog"))
-    }
+  #3 Loop checking file exist, downloading if necessary, and assigning to .pkgenv
+          for (rdsk in files.rds)
+          {
+          #See if file exists
+            in.path <- file.exists(file.path(gf ,rdsk))              #in groundhog.folder()
+            in.pkg  <-file.exists(system.file(rdsk, package = "groundhog"))  #in inst folder for groundhog
+          
+          #Case 1: in.pkg but not in path, copy it locally (but not being updated, to avoid wasteful copy )
+            if (in.path==FALSE & in.pkg==TRUE & update.toc==FALSE) {
+              file.copy  (system.file(rdsk, package = "groundhog") , file.path(gf, rdsk))
+              }
+            
+          #Case 2:  neither exists or if was asked for update, download
+            in.path <- file.exists(file.path(gf ,rdsk))              #redo the check to catch errors
 
-    .pkgenv[["missing.mran.dates"]] <- missing.mran.dates
-  } else {
-    #If updating 
-    dl_times <- try(download.file(paste0(groundhogR.url, "cran.times.rds"), times.path, mode = "wb", method = "libcurl"))
-    dl_toc <- try(download.file(paste0(groundhogR.url, "cran.toc.rds"), toc.path, mode = "wb", method = "libcurl"))
-    dl_mran <- try(download.file(paste0(groundhogR.url, "missing.mran.dates.rds"), mran.path, mode = "wb", method = "libcurl"))
-
-    cran.times <- readRDS(times.path)
-    cran.toc <- readRDS(toc.path)
-    missing.mran.dates <- readRDS(mran.path)
-
-    .pkgenv[["cran.times"]] <- cran.times
-    .pkgenv[["cran.toc"]] <- cran.toc
-    .pkgenv[["missing.mran.dates"]] <- missing.mran.dates
-
-    if (any(inherits(dl_times, "try-error"), inherits(dl_toc, "try-error"), inherits(dl_mran, "try-error"))) {
-      return(invisible(FALSE))
-    }
-  }
-
-  invisible(TRUE)
+            
+            if ((in.path==FALSE & in.pkg==FALSE) | update.toc==TRUE) {
+              
+            #Download groundhog
+              #R Version After 3.4
+               if (getRversion()>"3.4") {
+                dl <- try(utils::download.file(paste0(groundhogR.url, rdsk), file.path(gf, rdsk) , mode = "wb", method = "libcurl" ))
+            
+                #If download failed, try  wasabi's backup
+                  if (dl!=0) {
+                      dl2 <- try(utils::download.file(paste0(wasabi.url, rdsk), file.path(gf, rdsk), mode = "wb", method = "libcurl" ))
+                      if (dl2!=0) stop('Error.\nGroundhog says: could not download "', rdsk, "'")
+                    } #End if download filed from groundhogR.com
+               } #ENd if version 3.4
+              
+               #R Version before 3.4
+               if (getRversion()<"3.4") {
+                dl <- try(utils::download.file(paste0(groundhogR.url, rdsk), file.path(gf, rdsk) , mode = "wb" ))
+            
+                #If download failed, try  wasabi's backup
+                  if (dl!=0) {
+                      dl2 <- try(utils::download.file(paste0(wasabi.url, rdsk), file.path(gf, rdsk), mode = "wb" ))
+                      if (dl2!=0) stop('Error.\nGroundhog says: could not download "', rdsk, "'")
+                    } #End if download filed from groundhogR.com
+               } #ENd if version 3.4
+              
+              } #End case 2
+            
+          #Read it locally, dropping the .rds part of the name ('cran.toc.rds' -> 'cran.toc')
+              dfk <- gsub(".rds","",rdsk)
+             .pkgenv[[dfk]] <- readRDS(file.path(gf,rdsk))
+          }
+    
+  
+ 
+  #5 Return TRUE
+    invisible(TRUE)
 }

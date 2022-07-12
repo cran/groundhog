@@ -27,8 +27,8 @@ get.current.packages <- function(type) {
         error = function(e) NULL)
 		
         if (is.null(current.packages)) {
-			#Make empty available pacakges if offline or if older version of R being used to current packages is not available.	
-			current.packages <- data.frame(Package="", Version="")
+			#Make empty available packages if offline or if older version of R being used to current packages is not available.	
+			current.packages <- data.frame(Package="", Version="", stringsAsFactors=FALSE)
 			
         }
 	#If current packages is not empty, create pkg_vrs for it
@@ -36,7 +36,7 @@ get.current.packages <- function(type) {
 			current.packages$pkg_vrs <- paste0(current.packages$Package, "_", current.packages$Version)
 			}
 			
-        saveRDS(current.packages, ap_file_path)
+        saveRDS(current.packages, ap_file_path, version=2, compress=FALSE)
     } #End if file found
     
   return(current.packages)

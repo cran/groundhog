@@ -4,7 +4,7 @@
 \alias{get.snowball}
 \title{Generates dataframe with all dependencies needed to install a package, in the order they will be loaded}
 \usage{
-get.snowball(pkg, date, include.suggests = FALSE, force.source = FALSE)
+get.snowball(pkg, date, include.suggests = FALSE, force.install = FALSE)
 }
 \arguments{
 \item{pkg}{character string, name of target package to load (and install if needed),}
@@ -15,8 +15,8 @@ version of the package, and all dependencies, to be loaded (and installed if nee
 \item{include.suggests}{logical, defaults to \code{FALSE}. When set to \code{TRUE}, includes
 dependencies classified in the DESCRIPTION file as \code{suggested}.}
 
-\item{force.source}{logical (defaults to \code{FALSE}). When set to \code{TRUE}, will not attempt
-installing binary from CRAN or MRAN and instead download source file and install it.}
+\item{force.install}{logical, defaults to \code{FALSE}. When set to \code{TRUE}, the column \code{installed}
+in the generated snowball is set FALSE for all packages, causing them to be installed even if already installed.}
 }
 \value{
 a dataframe with all packages that need to be installed, their version , whether they are installed, where

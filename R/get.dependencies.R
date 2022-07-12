@@ -21,7 +21,7 @@
 
 get.dependencies <- function(pkg, date, include.suggests = FALSE) {
 
-  update_cran.toc_if.needed(date = date)
+  update_cran.toc_if.needed(date = date) #also loads the cran.toc if not yet loaded
   cran.toc <- .pkgenv[["cran.toc"]]
 
   
@@ -47,12 +47,7 @@ get.dependencies <- function(pkg, date, include.suggests = FALSE) {
   non.cran <- dep[!dep %in% cran.toc$Package]
   dep <- dep[!dep %in% non.cran]
 
-  #Give warning (commented out because this code is executed twice within a groundhog.library() call, and so it duplicates the warning)
-  #if (length(non.cran)>0) {   #This only considers non-cran dependencies which are not the packaae of interest, to avoid double reporting it
-  #  message2("groundhog.library() Warning: Missing dependencies *??!")
-  # message1("The following dependencies: '",non.cran,"' were not found on CRAN and their installation will not be attempted.")
-  # }
-
+  
   # These steps are normally taken care of server side but let's stay on the
   # safe side
   dep <- dep[dep != ""] # drop empty values
@@ -107,7 +102,7 @@ get.all.dependencies <- function(pkg, date, include.suggests = FALSE) {
     
     #5.6 Add new pairs to  dep12 
       if (length(pendingk) > 0) {
-        dep12k <- data.frame(pkg = depk, dep2 = pendingk)
+        dep12k <- data.frame(pkg = depk, dep2 = pendingk, stringsAsFactors=FALSE)
         dep12 <- rbind(dep12, dep12k)
         }
 
