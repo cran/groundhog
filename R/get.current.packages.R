@@ -20,10 +20,8 @@ get.current.packages <- function(type) {
         } else {
   #Else get available packages to see if each attempted to install is new
       current.packages <- tryCatch({
-          as.data.frame(
-          utils::available.packages(contriburl = utils::contrib.url(repos = "https://cloud.r-project.org/", type = type))[, c(1, 2)],
-          stringsAsFactors = FALSE
-        )},
+          as.data.frame(utils::available.packages(type = type)[, c(1, 2)],stringsAsFactors = FALSE)
+        },
         error = function(e) NULL)
 		
         if (is.null(current.packages)) {

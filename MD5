@@ -1,4 +1,4 @@
-e5d52386c2d8e74e5c6e2f0a44b3cc42 *DESCRIPTION
+403c3d24b85c6f32d716befabf8a2427 *DESCRIPTION
 4fa66169cca33f42b83b1a1b19f00716 *NAMESPACE
 27661a7eda3c4848a0ff7f9dcb36bb26 *R/check.snowball.conflict.R
 113cd0f6eabb5f60f623222c1c87e120 *R/cross.toc.R
@@ -6,7 +6,7 @@ fec2cc0190a7cad6b687983e4bcd420c *R/estimate.seconds.left.R
 10561f99857a9d6ab4b0ea0a71ae5ddd *R/get.R.pkg.date.R
 bbc06033604c293016c92c4c743dcc9d *R/get.active.R
 0f855d79ce3d561279bdaa812b85efc1 *R/get.baton.R
-f7870f082c17a2efe09d94ce76202ab2 *R/get.current.packages.R
+af7e96d1f0762fafa3cffd3a53fce948 *R/get.current.packages.R
 e970f0c0ed6457c9e95a467487e798f5 *R/get.date.for.install.binary.R
 94068f6137c4bcac34fe3a5e312dcb95 *R/get.dependencies.R
 8a61cc9db5365600a576e1b7f119bd72 *R/get.groundhog.folder.R
@@ -22,7 +22,7 @@ def2e2c7a77665ea240ed09f9ecb10c8 *R/groundhog.library.single.R
 b0cdfa059c638cc1d161a14b0813c302 *R/groundhog.library.single.remote.R
 a22438830c0a9cff7cdd351dac137f60 *R/install.snowball.R
 54e55fe7915025f38bd191f90a1e9218 *R/installation.feedback.R
-ba0223b41f87eba49eeda30460a569fb *R/load.cran.toc.R
+1957e521c4c579be66dfe02a22c38aea *R/load.cran.toc.R
 8aa3c8460ae806be601b0d7c2fa45867 *R/localize.R
 388e68695ea270030404f0ffb8ad66f7 *R/meta.groundhog.R
 ed650399c13d139596afff65e9323547 *R/mran.is.up.R
@@ -31,13 +31,13 @@ c399975b15ea5918c88936ceed68ce32 *R/r.version.check.R
 5c410197c70c0b9ec0db85901f5dda4e *R/remote_functions.R
 acf2464b4ba5bbbfe610a530d748a46b *R/toc.R
 83f89b693839a8d66aad5934e4712d14 *R/update_cran.toc_if.needed.R
-13097f82c9e2bb6c0ff89083813b34e6 *R/utils.R
+21d869b198c47bcd2f72985dec6c4ffb *R/utils.R
 d46ff7f6ed8a3b487f08bdcc4c2e0fb5 *R/validate.clone_date.R
 6eb76fc1b549f3dbed28f202bfccc618 *R/validate.pkg_vrs.R
 4dd7f784456eae6665c6af46cbc5a061 *R/validate_R.R
 21bce8d705dd075a0b3e22d8a4c3df29 *R/verify.snowball.loaded.R
 341bd4069d0a27e518e0cd0b737955f1 *R/zzz.R
-57f50715de168d113fa3149dc136743c *README.md
+b78ced9d6b8bc7e1e5a9eba0a0b5825f *README.md
 74b5185c3be5bf300837799746938d6d *inst/cran.times.rds
 126247cb479d2164d524c6426fa91223 *inst/cran.toc.rds
 ad36f1c0f8d67071df1012259054156a *inst/missing.mran.dates.rds
@@ -46,6 +46,6 @@ ad36f1c0f8d67071df1012259054156a *inst/missing.mran.dates.rds
 2aee35696ddb10b139d2e30711e40998 *man/get.snowball.Rd
 b2d0249e35e1163ca0281be8ea2d72ba *man/groundhog.library.Rd
 db19967262fcde893cbf0d0e4fa66182 *man/meta.groundhog.Rd
-99d32cc534d149069f39ede2c3329b2e *man/mran.is.up.Rd
+7f969a26625c42f491be0405954ce8fb *man/mran.is.up.Rd
 777f705a6f964bf4455f411a43e0ac84 *man/set.groundhog.folder.Rd
 d45687f78f6c3547846a4624380034a6 *man/toc.Rd
