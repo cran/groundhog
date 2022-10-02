@@ -1,4 +1,4 @@
-403c3d24b85c6f32d716befabf8a2427 *DESCRIPTION
+f4f151f1cc6d83f1c993d6958c966c08 *DESCRIPTION
 4fa66169cca33f42b83b1a1b19f00716 *NAMESPACE
 27661a7eda3c4848a0ff7f9dcb36bb26 *R/check.snowball.conflict.R
 113cd0f6eabb5f60f623222c1c87e120 *R/cross.toc.R
@@ -23,7 +23,7 @@ b0cdfa059c638cc1d161a14b0813c302 *R/groundhog.library.single.remote.R
 a22438830c0a9cff7cdd351dac137f60 *R/install.snowball.R
 54e55fe7915025f38bd191f90a1e9218 *R/installation.feedback.R
 1957e521c4c579be66dfe02a22c38aea *R/load.cran.toc.R
-8aa3c8460ae806be601b0d7c2fa45867 *R/localize.R
+7cd79dba995f359fee2182c3d1a7f848 *R/localize.R
 388e68695ea270030404f0ffb8ad66f7 *R/meta.groundhog.R
 ed650399c13d139596afff65e9323547 *R/mran.is.up.R
 2ee1c256542488fe7c3efda27a7f0007 *R/msg.R.switch.R
@@ -38,9 +38,9 @@ d46ff7f6ed8a3b487f08bdcc4c2e0fb5 *R/validate.clone_date.R
 21bce8d705dd075a0b3e22d8a4c3df29 *R/verify.snowball.loaded.R
 341bd4069d0a27e518e0cd0b737955f1 *R/zzz.R
 b78ced9d6b8bc7e1e5a9eba0a0b5825f *README.md
-74b5185c3be5bf300837799746938d6d *inst/cran.times.rds
-126247cb479d2164d524c6426fa91223 *inst/cran.toc.rds
-ad36f1c0f8d67071df1012259054156a *inst/missing.mran.dates.rds
+e78a74dcd2762966de15fc3a0f069925 *inst/cran.times.rds
+37560f0be34a46167decf17a0828a5dd *inst/cran.toc.rds
+5cf6e50e189706609ac0931d40e2f1d6 *inst/missing.mran.dates.rds
 4bc36f84771f258e419759ab8888ebf7 *man/cross.toc.Rd
 8474619dec11f7afcd9ed9e65097c3fe *man/get.groundhog.folder.Rd
 2aee35696ddb10b139d2e30711e40998 *man/get.snowball.Rd
