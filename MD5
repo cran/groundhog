@@ -1,4 +1,4 @@
-f4f151f1cc6d83f1c993d6958c966c08 *DESCRIPTION
+0a7b8ab7e0c9eacb276361954ddd85a5 *DESCRIPTION
 4fa66169cca33f42b83b1a1b19f00716 *NAMESPACE
 27661a7eda3c4848a0ff7f9dcb36bb26 *R/check.snowball.conflict.R
 113cd0f6eabb5f60f623222c1c87e120 *R/cross.toc.R
@@ -7,7 +7,7 @@ fec2cc0190a7cad6b687983e4bcd420c *R/estimate.seconds.left.R
 bbc06033604c293016c92c4c743dcc9d *R/get.active.R
 0f855d79ce3d561279bdaa812b85efc1 *R/get.baton.R
 af7e96d1f0762fafa3cffd3a53fce948 *R/get.current.packages.R
-e970f0c0ed6457c9e95a467487e798f5 *R/get.date.for.install.binary.R
+073288d6d0a954580f37f7538e7a0196 *R/get.date.for.install.binary.R
 94068f6137c4bcac34fe3a5e312dcb95 *R/get.dependencies.R
 8a61cc9db5365600a576e1b7f119bd72 *R/get.groundhog.folder.R
 281435d86f8c03af86a1f643ffe56ef5 *R/get.installation.time.R
@@ -27,7 +27,7 @@ a22438830c0a9cff7cdd351dac137f60 *R/install.snowball.R
 388e68695ea270030404f0ffb8ad66f7 *R/meta.groundhog.R
 ed650399c13d139596afff65e9323547 *R/mran.is.up.R
 2ee1c256542488fe7c3efda27a7f0007 *R/msg.R.switch.R
-c399975b15ea5918c88936ceed68ce32 *R/r.version.check.R
+c325a836b29dd2d0fcb74ad001516207 *R/r.version.check.R
 5c410197c70c0b9ec0db85901f5dda4e *R/remote_functions.R
 acf2464b4ba5bbbfe610a530d748a46b *R/toc.R
 83f89b693839a8d66aad5934e4712d14 *R/update_cran.toc_if.needed.R
@@ -38,9 +38,9 @@ d46ff7f6ed8a3b487f08bdcc4c2e0fb5 *R/validate.clone_date.R
 21bce8d705dd075a0b3e22d8a4c3df29 *R/verify.snowball.loaded.R
 341bd4069d0a27e518e0cd0b737955f1 *R/zzz.R
 b78ced9d6b8bc7e1e5a9eba0a0b5825f *README.md
-e78a74dcd2762966de15fc3a0f069925 *inst/cran.times.rds
-37560f0be34a46167decf17a0828a5dd *inst/cran.toc.rds
-5cf6e50e189706609ac0931d40e2f1d6 *inst/missing.mran.dates.rds
+682395ad9f8163a511e4565ccb1648f6 *inst/cran.times.rds
+0e4b4a5c401f3a36504667486beef70c *inst/cran.toc.rds
+4c876b08c654a826ea2fd796f5dd8c59 *inst/missing.mran.dates.rds
 4bc36f84771f258e419759ab8888ebf7 *man/cross.toc.Rd
 8474619dec11f7afcd9ed9e65097c3fe *man/get.groundhog.folder.Rd
 2aee35696ddb10b139d2e30711e40998 *man/get.snowball.Rd
