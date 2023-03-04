@@ -1,4 +1,4 @@
-0a7b8ab7e0c9eacb276361954ddd85a5 *DESCRIPTION
+83f3aad94c7dffdd087755367b88338f *DESCRIPTION
 4fa66169cca33f42b83b1a1b19f00716 *NAMESPACE
 27661a7eda3c4848a0ff7f9dcb36bb26 *R/check.snowball.conflict.R
 113cd0f6eabb5f60f623222c1c87e120 *R/cross.toc.R
@@ -9,7 +9,7 @@ bbc06033604c293016c92c4c743dcc9d *R/get.active.R
 af7e96d1f0762fafa3cffd3a53fce948 *R/get.current.packages.R
 073288d6d0a954580f37f7538e7a0196 *R/get.date.for.install.binary.R
 94068f6137c4bcac34fe3a5e312dcb95 *R/get.dependencies.R
-8a61cc9db5365600a576e1b7f119bd72 *R/get.groundhog.folder.R
+940f57c227a4980a928f032c69552329 *R/get.groundhog.folder.R
 281435d86f8c03af86a1f643ffe56ef5 *R/get.installation.time.R
 057ef34735547170d63e3876f75035f1 *R/get.installed_path.R
 5963f3521e28ce674524547d5c0a1036 *R/get.pkg_search_paths.R
@@ -31,12 +31,12 @@ c325a836b29dd2d0fcb74ad001516207 *R/r.version.check.R
 5c410197c70c0b9ec0db85901f5dda4e *R/remote_functions.R
 acf2464b4ba5bbbfe610a530d748a46b *R/toc.R
 83f89b693839a8d66aad5934e4712d14 *R/update_cran.toc_if.needed.R
-21d869b198c47bcd2f72985dec6c4ffb *R/utils.R
+4c8abb0ea39b5478683e0de0e88098b6 *R/utils.R
 d46ff7f6ed8a3b487f08bdcc4c2e0fb5 *R/validate.clone_date.R
 6eb76fc1b549f3dbed28f202bfccc618 *R/validate.pkg_vrs.R
 4dd7f784456eae6665c6af46cbc5a061 *R/validate_R.R
 21bce8d705dd075a0b3e22d8a4c3df29 *R/verify.snowball.loaded.R
-341bd4069d0a27e518e0cd0b737955f1 *R/zzz.R
+d1ad18d2a7c31fa1149abb66c6df6fda *R/zzz.R
 b78ced9d6b8bc7e1e5a9eba0a0b5825f *README.md
 682395ad9f8163a511e4565ccb1648f6 *inst/cran.times.rds
 0e4b4a5c401f3a36504667486beef70c *inst/cran.toc.rds
