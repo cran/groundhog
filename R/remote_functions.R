@@ -5,7 +5,7 @@
 #Function 5 Get lib for remote install of the package
 #Function 6 Identify remote ('github' vs 'gitlab';)
 #Function 7 make_package take a value entered by user, pkg or usr/pkg, or git::usr/pkg and turns it into a list with all the parts
-
+#Function 8 try_install_git()   - attempt to install a package from a local git repository
 
 #----------------------------------------------------------------
 
@@ -42,7 +42,7 @@
                           "versions of those packages directly with groundhog, but those earlier ",
                           "versions will not allow loading github and gitlab packages with groundhog. \n \n ")
             
-            if (pkg_utility=='git2r') message1(format.msg(msg,header="NOTE"))
+            if (pkg_utility=='git2r') message1(format_msg(msg,header="NOTE"))
             date2<-'2018-10-15'
             
           }
@@ -156,10 +156,8 @@
             if (time<min(sha_time$time)) {
                 date0 <- as.Date(min(sha_time$time)/86400,origin='1970-01-01')
                 msg<-paste0("Groundhog says: the package '" , usr , "/" , pkg ,"' was not yet available on ",
-                            "'" , remote_id ,"' on '", date, "'. The first commit was on '",date0,"'. \n ",
-                            "Please type 'OK' to confirm you have read this message")
-                     infinite.prompt(format.msg(msg),'ok')
-                     exit()
+                            "'" , remote_id ,"' on '", date, "'. The first commit was on '",date0,"'. ")
+                gstop(msg) #util #51
               }
                     
         #Find last commit before the 1st second of the day after the request
@@ -216,9 +214,9 @@
       
           #3 End if remote is unknown
                if (remote_id=="") {
-                    message('groundhog can only install non-CRAN packages from  GitHub and Gitlab.\n',
+                    msg <- paste0('groundhog can only install non-CRAN packages from  GitHub and Gitlab.',
                                     'The package "',pkg,'" is not recognized as either.')
-                    exit()
+                    gstop(msg) #util #51)
                }
             return(remote_id)
         } #End get.remote_id
@@ -240,7 +238,7 @@
       
     
       
-    #2 Fill in alterantive sytnaxes for pkg
+    #2 Fill in alternative sytnaxes for pkg
       #type=pkg
       
       if (pkg.type=='pkg')    {
@@ -363,7 +361,7 @@
       #7 If try 2 fails, give up
             if (methods::is(try2,'try-error')) {
               message("groundhog says:\n",
-                      "The 2nd path also did not work, could not install pacakge.")
+                      "The 2nd path also did not work, could not install package.")
             }
   } #End function
   

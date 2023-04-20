@@ -1,6 +1,6 @@
 Package: groundhog
 Title: Version-Control for CRAN, GitHub, and GitLab Packages
-Version: 2.2.1
+Version: 3.0.0
 Authors@R: c(
     person(given = "Uri",
            family = "Simonsohn",
@@ -21,11 +21,6 @@ Description: Make R scripts reproducible, by ensuring that
     date in the call. The date is used to call on the same version of the
     package every time (the most recent version available at that date).
     Load packages  from CRAN, GitHub, or Gitlab.	
-	=======================================
-	Note: groundhog relied on Microsoft's MRAN archive which is being discontinued.
-	This version of groundhog is transitioning away from MRAN, relying on it only for 
-	dates prior to Jan 31, 2023. A future release of groundhog, v2.3.0, 
-	expected by May 2023, will discontinue relying on MRAN entirely. 
 URL: https://groundhogr.com/,
         https://github.com/CredibilityLab/groundhog
 BugReports: https://github.com/CredibilityLab/groundhog/issues
@@ -36,9 +31,9 @@ License: GPL-3
 Encoding: UTF-8
 RoxygenNote: 7.2.3
 NeedsCompilation: no
-Packaged: 2023-03-04 05:20:43 UTC; _sohn
+Packaged: 2023-04-20 13:53:24 UTC; _sohn
 Author: Uri Simonsohn [aut, cre] (<https://orcid.org/0000-0002-8601-7211>),
   Hugo Gruson [ctb, aut] (<https://orcid.org/0000-0002-4094-1476>)
 Maintainer: Uri Simonsohn <urisohn@gmail.com>
 Repository: CRAN
-Date/Publication: 2023-03-04 07:20:04 UTC
+Date/Publication: 2023-04-20 14:10:02 UTC

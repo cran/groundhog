@@ -9,7 +9,7 @@ get.version <- function(pkg, date, patch = c("current")) {
         ip.base     <- data.frame(utils::installed.packages(priority="base"), stringsAsFactors = FALSE)    
         ip.base.pkg <- ip.base[ip.base$Package == pkg,]
           
-        #if a user has a misconfigured copy of R, they may have two verson of the same base package, take the highest of them 
+        #if a user has a misconfigured copy of R, they may have two version of the same base package, take the highest of them 
           #return(ip.base.pkg$Version) #up to 2021 - 10 - 30
         
         return(max(ip.base.pkg$Version))
@@ -22,9 +22,8 @@ get.version <- function(pkg, date, patch = c("current")) {
 
   # 2.2 Check if date request comes after first date for that package
     if (dfk$Published[1] > date) {
-      message2()
-      message1("According to our records, the package '", pkg, "' was not yet available on CRAN on '", date, "'")
-      exit()
+      msg = paste0("According to our records, the package '", pkg, "' was not yet available on CRAN on '", date, "'")
+      gstop(msg)
     }
     
   # 2.3 Update cran.toc if  requested date comes before most up to date date
