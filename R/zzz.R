@@ -8,9 +8,14 @@
       
         
 
+    
+        
   .onLoad <- function(libname, pkgname) {
   
+     
+    
     #1 pkgenv values
+            
     
           #1.1 Empty paths for groundhog loaded packages
             .pkgenv[['groundhog.paths']] <- c(character())
@@ -36,25 +41,45 @@
               .pkgenv[['default_libpath']] <-  .libPaths()
               .pkgenv[['hogdays']] <-c()
               .pkgenv[['conflicts']] <- ''
-
-    #2 Hidden variables in local environment
-        .available.restore.points <<- get.restore.points()
-        .view.conflicts <<- view.conflicts.function()
+              
+          
+      
+    #2 Hidden variables in local environment (need to equate to functions in zzz to avoid error on check)
+        .available.restore.points <<- get.restore.points()   #Utils.R #55
+        .view.conflicts <<- view.conflicts.function()        #Utils.R #57
     
         
     #5 Verify a mirror has been set    
-      set.default.mirror() #Function 36 -  utils.R
+      set.default.mirror() #utils.R  #36
   
-    #6 Check if new version of groundhog exists, if we have not checked today yet
-       if (check.consent(ask=FALSE)==TRUE) check.groundhog.version(min.days=1) #Function 42  -  utils.R
-          
-    #7 Load cran toc if available
-       if (check.consent(ask=FALSE)==TRUE) load.cran.toc()
+    #6 Some checks after consent given
+         if (check.consent(ask=FALSE)==TRUE) 
+         {
+          #6.1 New groundhog?
+            check.groundhog.version(min.days=1) #Utils.R #42
+
+          #6.2 R too new?
+            #check_R_old_enough()
+           
+          #6.3 cran toc available?
+             load.cran.toc()
+         }
+ 
+    #7 Delete purge subfolder with to-be-deleted pkgs (put here when using copy-and-delete method)
+      #purge for >=3.0.0
+         purge_path <- paste0(.libPaths()[1],"/_purge")
+         if (dir.exists(purge_path)) try(unlink(purge_path,recursive=TRUE))
+         
+      #purge <3.0.0
+         try(purge_v2.2()) #Utils #66
+
+   
+         
   
     } #End of onLoad
 
 
-#7. Attaching 
+#8. Attaching 
     #' @importFrom utils packageVersion compareVersion
      
     .onAttach <- function(libname, pkgname) {
@@ -66,8 +91,11 @@
           packageStartupMessage ("Tips and troubleshooting: https://groundhogR.com")
 
     #While developing:
-      #packageStartupMessage ("##########################################\n This version: 2023 04 19 - 12.09")
+          #packageStartupMessage ("#######################################################\n",
+           #                    "This DEV version: 2023 05 05 - 15:29 (Barcelona time)")
 
+      
+      
   } #End on attach
     
     

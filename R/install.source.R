@@ -2,15 +2,31 @@
 
   install.source <- function(snowball,date,cores)
   {
-     
-     
-    # #0 Add all paths so that it is found when attempted
-    #   .libPaths(unique(snowball$installation.path))
-    # 
-    #0.5 Parallel installation if more than 1 core and more than 1 package
-      batches.failed <- 0 #flag turns to 1 if batches attempted and fail                      
-
-
+    
+    #Restart the feedback data.frame  so that if they install something new it starts from scratch
+      on.exit(.pkgenv[['df.feedback']]<-NULL)
+    
+    #0 Message if error
+        message_with_solutions <- 
+                          paste("Possible solutions:\n",
+                                "  1) First, simply try again, the error may be a fluke.\n",
+                                "  2) Inspect console log, you could be missing non-CRAN dependencies\n",
+                                "     (e.g., RTools for Windows, XQuartz for Mac, libssl for Ubuntu),\n",
+                                "     or have a connection problem, or another compatibility problem.\n",
+                                "  3) If the error indicates that a dependency is missing, re-run the\n",
+                                "     groundhog.library() call with option `force.install=TRUE`\n",
+                                "  4) If the package that failed is a dependency for a package you want,\n",
+                                "     you may install another version of that failed dependency directly\n",
+                                "     with a groundhog.library() call, just for that failing pkg, for a \n",
+                                "     different date. Then re-run this groundhog.library() call adding the\n",
+								                "     `ignore.deps` argument, to allowing the version mismatch for that pkg.\n",
+								                "     Use `toc(<pkg>)` to find out version release dates of 'pkg'.\n",
+								                "  5) Similar to (4), use toc(<pkg>) to find the date for the next version\n",
+								                "     of the failing pkg and use a date after it for this entire\n",
+								                "     groundhog.library() call.\n",
+								                "  6) Visit http://groundhogr.com/troubleshooting")
+                 
+    
     #1 Keep only source  packages that are not yet installed
         snowball <- snowball[snowball$from  %in% c('source', 'github','gitlab') & snowball$installed==FALSE, ]
         
@@ -67,15 +83,8 @@
       if (cores>1 & nrow(snowball)>1)
       {
         
-          #3.0 Log path
-              log_cores_path <- paste0(get.groundhog.folder(),"/batch_installation_console.txt")
-              log_path         <- paste0(get.groundhog.folder(),"/batch_installation_log.txt")
-              dir.create(dirname(log_path),recursive = TRUE,showWarnings = FALSE)
-            
-              #Clear the log path
-              unlink(log_path)
               
-          #3.0.5 Message  
+          #3.0 Message  
               message1("Will rely on `",cores, "` core processors for faster in-parallel installation")
               message1("To force sequential installation set option `cores=1` in groundhog.library() ")
         
@@ -87,66 +96,49 @@
               
               for (k in 1:length(snowflakes))
               {  
-                cluster_id <- parallel::makeCluster(getOption("cl.cores", min(cores,length(snowflakes[[k]]))),outfile=log_cores_path)
-            
-            #3.3 Inner parallel loop with pkgs from source
-                parallel::clusterExport(cluster_id, 
-                           unclass(utils::lsf.str(envir = asNamespace("groundhog"), all = TRUE)),
-                           envir = as.environment(asNamespace("groundhog")))
-                           
-                  #exporting all function to cluster, solution from 
-                  #https://stackoverflow.com/questions/67595111/r-package-design-how-to-export-internal-functions-to-a-cluster
                 
             #3.4 Get snowball subset for this snowflake
-                snowball.k <- snowball[snowball$pkg %in% snowflakes[[k]], ]
+                  snowball.k <- snowball[snowball$pkg %in% snowflakes[[k]], ]
                       
-            #3.5 Sort snowball.k by decreasing installation time
-                #Feedback
-                  message.batch.installation.feedback(snowball,snowflakes,k,cores) #message.batch.installation.feedback.R
+            #3.5 Feedback
+                  try(message.batch.installation.feedback(snowball,snowflakes,k,cores)) #message.batch.installation.feedback.R
                   
                   
-                  #utils 48 in 'parallel groundhog' and utils #44
-      
-            #3.6 Install the snowflake
-                  parallel::parLapply(cluster_id , snowball.k$source_url , install.one)  #install.one.R has this function 'install.source 
-              
-            #3.7  Kill the cluster
-                  parallel::stopCluster(cluster_id)   
+            #3.6 Subset the flake into 'source' vs remote
+                  snowball.k_source <- snowball.k[snowball.k$from=='source',]
+                  snowball.k_remote <- snowball.k[snowball.k$from!='source',]
+                  n.source <-nrow(snowball.k_source)
+                  n.remote <-nrow(snowball.k_remote)
                   
-            #3.8 Check that everything was installed.
+            #3.7 Install source in snowflake
+                  if (n.source>0) {
+                  utils::install.packages(snowball.k_source$source_url,repos=NULL, type='source', Ncpus=min(cores,n.source),
+                                   lib=snowball.k_source$installation.path)
+                  }
+                  
+            #3.8 Install remotes in snowflake
+                  if (n.remote>0) {
+                    for (rk in 1:n.remote)
+                    {
+                    install.one (url=snowball.k_remote$source_url[rk])  
+                    }  
+                  }
+                  
+            #3.9 Check that everything was installed.
                   ip <- data.frame(utils::installed.packages(),stringsAsFactors = FALSE,row.names = NULL)
                   ip$pkg_vrs = paste0(ip$Package,"_",ip$Version)
                   snowflake.pkg_vrs <- snowball$pkg_vrs[snowball$pkg %in% snowflakes[[k]] ]
                   missing.pkg_vrs <-  snowflake.pkg_vrs[!snowflake.pkg_vrs %in% ip$pkg_vrs]
                   
-                    
-                  #Localize pkgs in snowball that succeeded to be installed 
-                   #localize.snowball(snowball [(snowball$pkg %in% snowflakes[[k]]) & 
-                                               #(snowball$pkg_vrs %in% ip$pkg_vrs), ])
-                  
                    
                 
-            #3.9 If it was not, try sequentially
+            #3.10 If it was not, error
                   if (length(missing.pkg_vrs)>0) {
-                    
-            
-                    
-                    #Message end batch installation
-                      msg=paste("Installation of ",pasteQC(missing.pkg_vrs)," failed.\n",
-                              "Will attempt installing sequentially")
-                    
-                      message(msg)
-                    
-                    #Flag that batch installation failed
-                      batches.failed <- 1
-                    
-                    #recheck if packages are installed or not
-                      snowball$installed <- snowball$pkg_vrs %in% ip$pkg_vrs
-                    
-                    break
+                      message1("\nThe following package(s) from this batch failed to install:\n",pasteQC(missing.pkg_vrs))
+					            message1("\n" , message_with_solutions)
+                      message('\n\n                  --   Installation Failed   --  ')
+                      exit()
                   }
-                  
-                  
                 
             } #Loop installing snowflakes
               
@@ -155,7 +147,7 @@
           
           
     #4 Sequential installation
-      if (cores==1 | nrow(snowball)==1 | batches.failed==1)
+      if (cores==1 | nrow(snowball)==1 )
       {
           
           #4.2 Start clock for install feedback k=1
@@ -170,34 +162,17 @@
               #Install
                 install.one (url=snowball$source_url[k])       
               
-                
-                
               #Verify installation
                   ip <- data.frame(utils::installed.packages(),stringsAsFactors = FALSE,row.names = NULL)
                   ip$pkg_vrs = paste0(ip$Package,"_",ip$Version)
                   if (!snowball$pkg_vrs[k] %in% ip$pkg_vrs) {
-                    msg=paste0("The package ",snowball$pkg_vrs[k]," failed to install.")
                     
-                    #r tools?
-                     if (get.os()=='windows')
-                      {
-                       make<-Sys.which("make")
-                        if (nchar(make)<2) {
-                          paste0(msg,"\n",
-                               "It seems you do not have R Tools installed which may explain the problem.\n",
-                               "Check out https://groundhogr.com/rtools/")
-                          } #End no R Tools
-                          }#End windows
-                        
-                    
-                    gstop(msg)
-                    
+                      message1("\nThe package '",snowball$pkg_vrs[k],"' failed to install.")
+					            message1("\n" , message_with_solutions)
+                      message('\n\n                  --   Installation Failed   --  ')
+                      exit()
                   }
          
-              
-              #localize
-                #localize.snowball(snowball [k,])
-              
               }  #End install loop
       
     } #End sequential install

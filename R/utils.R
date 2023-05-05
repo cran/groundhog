@@ -29,7 +29,7 @@
 #28 DROPPED
 #29 read.desc2()
 #30 DROPPED
-#31 pasteQC()                  :  paste a vector separating elements by quots  c('a','b','c')-->  string: '"a","b","c"'
+#31 pasteQC() & pasteN         :  paste a vector separating elements by quots  c('a','b','c')-->  string: '"a","b","c"' or 
 #32 infinite.prompt()          :  ask the same question until a valid answer is provided
 #33 get.packages_df()          :  data.frame with installed packages in local library
 #34 sandwich.library()         :  turn a string containing library calls into a vector of pkg names
@@ -55,10 +55,18 @@
 #54 filesize_format            : turn bytes file size to human readable
 #55 get.restore.points         : vector with dates available 
 #57 View conflicts             : view conflicting pkgs in recent call
-#58 Get ip.groundhog():        : installed.packages data.frame for all packages in groundhog library and loans
-#59 get ip.backup()            : same for all packages that have been saved to the backup folder
+#59 getip()            : same for all packages that have been saved to the backup folder
 #60 get.loans() & /save.loans(): load and save database with all lent packages
 #61 file.rename.robust:        :  rename a file ony once it can be renamed to itself
+#62 get drive from path whether they use forward or backwards slashes
+#63 Slower with dropbox
+#64 get md5
+#65 Add _PURGE to a pkg path in local
+   
+#68 Download toc               : download a toc file from wasabi or groundhogr.com
+#69 Test renaming method()     : checks whether we can rename into a chose path (for check with set.groundhog.folder()
+
+   
 
 ####################################################################################
     
@@ -450,11 +458,17 @@
           
 
 
-#31 pasteQC
+#31 pasteQC & pasteN
     pasteQC<-function(x)
       {
       paste0("'", paste0(x ,collapse="', '"),"'")
     }
+    
+    pasteN<-function(x)     {
+      paste0("'",paste0(x ,collapse="'\n'"),"'")
+    }
+    
+    
     
     
 #32 infinite.prompt
@@ -676,7 +690,7 @@
 #39 save.cookie() and read.cookie()
     
     #39.1 SAVE
-        save.cookie <- function(cookie_name)
+        save.cookie <- function(cookie_name, cookie_contents=as.numeric(Sys.time()))
         {
         #Create cookies directory
           cookies_dir <- paste0(get.groundhog.folder(),"/cookies")
@@ -686,7 +700,7 @@
           cookie_path <- file.path(cookies_dir, paste0(cookie_name,".csv"))
           
         #Save time
-          utils::write.csv(as.numeric(Sys.time()),cookie_path,row.names = FALSE)
+          utils::write.csv(cookie_contents,cookie_path,row.names = FALSE)
         }
         
      #39.2 Does cookie exist
@@ -715,15 +729,38 @@
         }
      }#End of read cookie
       
+    #39.4 Read cookie
+        read.cookie <- function(cookie_name)
+        {
+          cookie=''
+          cookies_dir <- paste0(get.groundhog.folder(),"/cookies")
+          cookie_path <- file.path(cookies_dir, paste0(cookie_name,".csv"))
+          if (file.exists(cookie_path)) {
+            cookie.full <- utils::read.csv(cookie_path)
+            cookie <- try(cookie.full[1,1]) #cookie is a dataframe, we use the sedon value
+          }
+          if (is.null(cookie)) cookie <- ''
+          return (cookie) 
+       }
+          
+    #39.5 Delete cookie
+      delete.cookie <- function(cookie_name)
+        {
+          cookies_dir <- paste0(get.groundhog.folder(),"/cookies")
+          cookie_path <- file.path(cookies_dir, paste0(cookie_name,".csv"))
+          unlink(cookie_path)
+        }
   
-    #39.4 Save Session cookie
+        
+  
+    #39.6 Save Session cookie
       save.session.cookie<-function(cookie_name)
       {
         .pkgenv[[cookie_name]] <- Sys.time()
         
       }
       
-    #39.5
+    #39.7
       get.minutes.since.session.cookie<-function(cookie_name)
       {
         #Not set, return 99999
@@ -1113,7 +1150,7 @@ get.parallel.time<-function(times,cores)
     }
 
   
-#58 get.ip
+#59 get.ip
   get.ip <- function(location)
   {
     #1 Get all subfolders for backup and groundhog
@@ -1252,3 +1289,190 @@ get.parallel.time<-function(times,cores)
         
    }
    
+ #---------------------   
+  
+  #64 get md5
+   get.md5<-function(pkg_path)
+   {
+     description.path <- paste0(pkg_path,"/DESCRIPTION")
+     md5 <- tools::md5sum(description.path)
+     return(md5)
+     
+   }
+   
+ #---------------------   
+  
+   #65 Add _PURGE to a pkg path in local
+   purge.pkg_path <- function(pkg_path)
+   {
+     
+     #Generate N random strings of letters
+      #random=c()
+      #for (k in 1:length(pkg_path)){
+      #random[k] =paste0(sample(letters,6,replace=TRUE),collapse = '')
+      #}
+      random <- paste0(sample(letters,6,replace=TRUE),collapse = '')
+      
+    #New name merges path name, random letters and PURGE
+      #new.pkg_path <- paste0(pkg_path,"_",random,"_PURGE")
+      
+    #PUt in subfolder which is not read by installed.packages()  /_purge
+      #Dir _purge
+         purge_dir <- paste0(dirname(pkg_path),"/_purge")
+         
+      #Esnure it exists
+         dir.create(purge_dir,showWarnings = FALSE,recursive = TRUE)
+         
+      #New path
+         new.pkg_path <- paste0(purge_dir,"/" , basename(pkg_path),"_",random)
+   
+    #Rename
+      file.rename(pkg_path, new.pkg_path)
+       }
+   
+#---------------------   
+  
+#66 PUrge packages from version 2.2
+   purge_v2.2 <- function()
+   {
+     #if (!cookie.exists('purged_2.2'))
+     #{
+     #Save the cookie
+      # save.cookie('purged_2.2')
+       
+     #Delete to be purged packages (for version 2.2, if they were purged in 2.2 and then updated_
+          pkg_list       <- list.files(.libPaths()[1])
+          pkg_list_purge <- pkg_list[regexpr('_PURGE',pkg_list) >=0]
+          if (length(pkg_list_purge)>0)
+          {
+            path_all <- paste0(.libPaths()[1],"/",pkg_list_purge)
+            try(unlink(path_all,recursive=TRUE))
+          }
+          
+     #} #End if no-cookie 
+    }#End purge
+  
+#---------------------   
+#67 Get gran_path
+   get.gran.filename <-function()
+   {
+    #Assume there is no path to gran.toc
+      gran.filename <- ''
+  
+    #Create the name of the file
+       os <- get.os()
+       if (os %in% c('windows','mac', 'mac_arm')) {
+        
+          #User has this R version  
+            r.version    <- get.r.majmin()
+            
+          #Drop the period
+            rv <- sub("\\.","",r.version)
+  
+          #rds with gran toc 
+            gran.filename <- paste0(os, rv,'.rds')
+            
+          #use mac for mac_arm for R<4.14
+            if (os=='mac_arm' & as.numeric(r.version)<4.1) {
+                  gran.filename <- paste0('mac', rv,'.rds')
+                }
+       } #End windows/mac
+       return(gran.filename)
+   }
+      
+         
+#68 Download toc
+  download.toc<-function(url1 , url2 , path)
+  {
+    #Try URL1
+       if (getRversion()<"3.4") dl  <- try(utils::download.file(url1 ,path,mode='wb'))
+       if (getRversion()>"3.4") dl  <- try(utils::download.file(url1 ,path))
+  
+    #If fails, try URL2          
+      if (dl!=0) {
+          dl2 <- try(utils::download.file(url2 ,path))
+          if (getRversion()<"3.4") dl2  <- try(utils::download.file(url2 ,path,mode='wb'))
+          if (getRversion()>"3.4") dl2  <- try(utils::download.file(url2 ,path))
+  
+          if (dl2!=0) stop('Error.\nGroundhog says: could not download needed file: "', basename(path), "'")
+          }
+  } 
+    
+    
+#-------------------------------
+    
+#69 Test renaming method
+    test.renaming.method <- function(from_path)
+    {
+    #Path to new folder we are creating
+      old_dir  <- paste0(from_path , "/_test_renaming_method") 
+  
+      
+    #It will contain two folders
+      dir_f1 <-paste0(old_dir,"/folder1")
+      dir_f2 <-paste0(old_dir,"/folder2")
+    
+    #Create them  
+      dir.create(dir_f1,recursive = TRUE,showWarnings = FALSE)
+      dir.create(dir_f2,recursive = TRUE,showWarnings = FALSE)
+      
+    #Save files in them
+      utils::write.csv("file1", file.path(dir_f1,"test1.csv"))
+      utils::write.csv("file2", file.path(dir_f2,"test2.csv"))
+      
+    #Error if they were not saved
+      if (!file.exists(file.path(dir_f1,"test1.csv")))
+        {
+        gstop(paste0("groundhog says: Unable to save to '",from_path,"'. Make sure you are allowed to save files to that directory."))
+        return(FALSE) #Should not get here, just as a precaution, gstop() should exit
+        } 
+  
+    
+    #Attempt renaming
+      new_dir <- paste0(get.groundhog.folder() , "/_test_renaming_method")
+      outcome <- file.rename(old_dir, new_dir)
+
+    #Delete
+      if (dir.exists(old_dir)) unlink(old_dir,recursive = TRUE)
+      if (dir.exists(new_dir)) unlink(new_dir,recursive = TRUE)
+    
+    return(outcome)
+    }
+    
+    
+#70  Check r_21days
+    check_R_old_enough <- function(min.days=21)
+    {
+      
+      #Dates of R vs today
+        r_release_date <- get.r.majmin.release()
+        today          <- Sys.Date()
+            
+      #Name of the cookie used tot keep track of the warning
+        cookie_name <- paste0('too_soon_R',get.r.majmin())
+            
+      #Do the check
+            if (today-r_release_date<min.days) {
+                if (!cookie.exists(cookie_name))
+                {
+                #Save cookie so we do not show again
+                  save.cookie(cookie_name)
+                  
+                #Draft msg
+                   msg = paste0("The version of R you are using ('R-",get.r.majmin(),"') is less than ",min.days,
+                         " days old (it was released on '",r_release_date,"'). ",
+                         "Because some packages break with new releases, and many are updated shortly after them, ",
+                         "you may want to stick to the older version of R ",
+                         "for a few more days.  This message will not be shown again for R-",get.r.majmin(),". ",
+                         "To ignore this warning simply re-run the command you just ran.")  
+               #Show msg
+                    gstop(format_msg(msg,header="NOTE:"))
+                
+                }
+            }
+    }
+    
+    
+#71 eval2()
+    eval2 <- function(s)  eval(parse(text=s),  parent.frame())  
+           

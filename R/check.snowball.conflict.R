@@ -206,11 +206,11 @@
       #If installation just happened
       msg <- ''
       if (sum(snowball$installed==FALSE)>0) {
-        message2( "Installation succesfull.")
+        message2( "Installation successfull.")
         }
         
         msg <- paste0(msg, 
-                  "The packages you just installed need a new R session to be loaded.\n",
+                  "The requested packages are now ready to be loaded.\n",
                   "Restart the R session and re-run groundhog.library() to load them.",f10)
       
 		    #message(msg)

@@ -23,7 +23,7 @@ groundhog.library(
 
 \item{date}{character string  (yyyy-mm-dd), or date value, with the date which
 determines the version of the package, and all dependencies, to be loaded
-(and installed if needed). The most recent #'date accepted is 2 days prior
+(and installed if needed). The most recent date accepted is 2 days prior
 to when the code is executed.}
 
 \item{quiet.install}{logical, defaults to \code{TRUE}. When set to \code{FALSE}, displays
@@ -38,16 +38,19 @@ dependency for the package being loaded (mismatch of version), but which should 
 and groundhog.library() should proceed tolerating the conflict.}
 
 \item{force.source}{logical (defaults to \code{FALSE}). When set to \code{TRUE}, if the requested package,
-or its dependencies, needs to be installed, they will be installed from source (much slower than from binaries).}
+or its dependencies, needs to be installed, they will be installed from source
+(much slower than from binaries).}
 
-\item{force.install}{logical (defaults to \code{FALSE}). When set to \code{TRUE}, will re-install the requested packages and
+\item{force.install}{logical (defaults to \code{FALSE}). When set to \code{TRUE},
+will re-install the requested packages and
 their dependencies even if they are already installed.}
 
 \item{force.source.main}{logical (defaults to \code{FALSE}). When set to \code{TRUE}, if the
 requested package needs to be installed it will be installed from source
 (but dependencies are installed from binaries if needed and available).}
 
-\item{force.install.main}{logical (defaults to \code{FALSE}). When set to \code{TRUE}, will re-install the requested packages even
+\item{force.install.main}{logical (defaults to \code{FALSE}). When set to \code{TRUE},
+will re-install the requested packages even
 if they are already installed (but dependencies will not be re-installed).}
 
 \item{tolerate.R.version}{optional character string containing an R version
@@ -55,9 +58,9 @@ which \code{groundhog.library()} will not throw an error for using, even if the
 date entered corresponds to a more recent major R release.}
 
 \item{cores}{Integer. The maximum number of cores to use during parallel installation
-of source packages. The default, -1, uses the total number of cores available minus 2.
+of source packages. The default, -1, uses the total number of cores available minus 1.
 Setting \code{core}=1 leads to installing source packages, and also to downloading binaries,
-sequentially.}
+sequentially. When installation fails, you may want to try cores=1}
 }
 \description{
 Load requested package(s)  as current on a requested date. If the needed version
@@ -74,10 +77,10 @@ For more information about groundhog check out \href{http://groundhogr.com}{grou
 }
 \examples{
 \dontrun{
-groundhog.library("magrittr", "2022-04-01")
+groundhog.library("magrittr", "2022-04-15")
 
 pkgs <- c('pwr','metafor')
-groundhog.library(pkgs, "2022-04-01")
+groundhog.library(pkgs, "2022-04-15")
 
 # When running an existing  script that relied on `library()` to load packages,
 # you can wrap the library calls in double-quotes, loading the packages with 
