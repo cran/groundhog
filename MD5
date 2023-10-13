@@ -1,4 +1,4 @@
-98f86953b08bf821b6f2a2860bf814b8 *DESCRIPTION
+2ff3c5457b13344174e3eb86f7c96157 *DESCRIPTION
 3cb7b3b330b39315b3b21779730319d4 *NAMESPACE
 0e5afe1492f97a4337b5b8df16b8bbb7 *R/all.already.attached.R
 f3de4c780153e3efd1a876d1502e636a *R/check.snowball.conflict.R
@@ -37,13 +37,13 @@ c325a836b29dd2d0fcb74ad001516207 *R/r.version.check.R
 2600574a2642e773126f409b19353e2d *R/toc.R
 03560264d91a5e5e9b6263d0eee16714 *R/try.renaming.method.again.R
 bc8770ad0c2612531960388c90fbf1e7 *R/update_cran.toc_if.needed.R
-b189f14ba963ab01316fea81d51e7be3 *R/utils.R
+25518e0c7c86eda52158368bdab9608e *R/utils.R
 e91e9dc15b127ecdd64bf227a8f1e15e *R/validate.clone_date.R
 b7f9c9bea9704fc25ed1c2a5d799d818 *R/validate.groundhog.library.R
 62251726b87b7c5e65e7a4b1975ad279 *R/validate.pkg_vrs.R
 54886ae2db95cfbe47e0e0dfaae987fb *R/validate_R.R
 0b85a4751018286e80bc11c556785a7e *R/verify.snowball.loaded.R
-47a2deef9c18b9cf0e1ed16123885c65 *R/zzz.R
+ad59fb2d6f5af7d796a82d6433d09909 *R/zzz.R
 df9d28b08262d2786f8870eba37b5e11 *README.md
 4bc36f84771f258e419759ab8888ebf7 *man/cross.toc.Rd
 8474619dec11f7afcd9ed9e65097c3fe *man/get.groundhog.folder.Rd
