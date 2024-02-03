@@ -70,13 +70,13 @@
 #'
 #' @importFrom utils capture.output
 #'
-#' @details For more information about groundhog check out [groundhogr.com](http://groundhogr.com)
+#' @details For more information about groundhog check out [groundhogr.com](https://groundhogr.com)
 #' @export
 #'
 #----------------------------------------------------------------------
 #OUTLINE 
   #1 Preliminaries
-  #2 Dropped
+  #2 Directly attach cached pkgs
   #3 Get snowballs for all requested packages
   #4 Create libpaths
   #5 Check conflict with previously groundhog-loaded packages
@@ -144,16 +144,17 @@
    
     
           
-   #1.8 Non-remote packages, early return if everything is already attached 
+   #1.8 Early return for pkgs that are ready (non-remotes)
           remote <- basename(pkg)!=pkg      
           n.remote <- sum(remote)
-         
-        if (n.remote==0 & already.all.attached(pkg , date) ) return(invisible(TRUE))
+        
+          if (n.remote==0 & already.all.attached(pkg , date) ) return(invisible(TRUE))
           #already.all.attached.R produced: message1("All requested packages are already attached")
-
+     
+          
           
       
-    #Note: 1,8 & 1.9 could be done on loading, but, better here : (i) in case the user makes a change, and (ii) avoid writing files without authorization
+    #Note: 1.9 & 1.10 could be done on loading, but, better here : (i) in case the user makes a change, and (ii) avoid writing files without authorization
     #1.9  Verify a mirror has been set (utils.R #36)    
         set.default.mirror() 
     
@@ -193,7 +194,103 @@
 
       
 
+      
+  #2 Directly attach packages in Cache and drop from consideration packages already attached
+  #only for non-remote pkgs
+      
+      #Make copy of all pkgs requested for final verification to include those attached
+          pkg_full_request = pkg
+
+      if (n.remote==0 & force.install==FALSE)
+      {
+      #Bracket everything in a try() since failure merely means we will run slightly slower)
+      direct.install.attempt = try({
+      
+      #Directly attach
+        pkg_vrs.already_attached    = c()
+        pkg_vrs.attached_from_cache = c()
+
+      
+      #pkgs that are active
+        .pkgenv[['active']]   = active = get.active()
+        .pkgenv[['attached']] = attached = attached_before = get.attached() 
+        
+  
+      #Read cache
+        #see cache_functions.R
+          cache.current = is.cache.current()  #TRUE/FALSE is the cache more recent than any installed pkg
+          cache = read.cache()
+        
+
+      #Loop looking for already attached or already cached pkgs
+
+        for (pkgk in pkg)
+        {
+          #Is it already attached?
+            #Get pkg_vrs
+              pkgk_vrs=paste0(pkgk,"_",get.version(pkgk,date))  
+              
+            #ALREADY ATACHED?
+              
+              #Found it?
+                if (pkgk_vrs %in% attached$pkg_vrs)
+                {
+                  
+                #Drop this pkgk
+                  pkg=pkg[pkg != pkgk]
+                  
+                #Add pkg__vrs to those that will be shown as 'aready attached'
+                  pkg.already_attached = c(pkg_vrs.already_attached, pkgk_vrs)
+                  
+                } else {
+                
+              #CACHE
+                #If cache's date matches the requested date, and it is current 
+                if (cache$date==date & cache.current==TRUE)
+                {
+                  if (pkgk %in% cache$pkg)
+                  {
+                
+                  #Attach it
+                    base.library(pkgk, character.only=TRUE)
+  
+                  #Drop this pkgk
+                    pkg = pkg[pkg != pkgk]
+                    
+                  #Add to vector with attached.cache
+                    pkg_vrs.attached_from_cache = c(pkg_vrs.attached_from_cache , pkgk_vrs) 
+  
+                  } #End if pkg foudn in cache
+                  
+                } #End if cache date matches requested date
+                } #End else not found already attached  
+            }  #End loop over pkgk
+        
+      
+      #Early return if there are no pkgs left
+        if (length(pkg)==0) {
+          attached = get.attached()
+          for (pkgk in pkg_full_request)
+          {
+            pkgk_vrs=paste0(pkgk , "_" , get.version(pkgk,date))
+          #Message wtih feedback
+            if (pkgk_vrs %in% attached$pkg_vrs & !pkgk_vrs %in% attached_before$pkg_vrs)  message1("Successfully attached '",pkgk_vrs,"'")
+            if (pkgk_vrs %in% attached$pkg_vrs & pkgk_vrs %in% attached_before$pkg_vrs)   message1("Had already  attached '",pkgk_vrs,"'")
+            if (!pkgk_vrs %in% attached$pkg_vrs) message("Failed to attached '",pkgk_vrs,"'")
+
+          }
+          
+          return(invisible(TRUE))
+        }
+        
+        
+      })  #Close try() of direct install, so that if anything leading to a faster install fails, we ignore it and move on with slightly slower default.
+
+      } #End if n.remote==0; do not do cache with remote pkgs
+      
+      
 #3 Get snowballs for all requested packages
+      
   #Save snowballs individually as a list and also as a single big snowball.all
         
       #3.1 Non-remote snowball
@@ -321,8 +418,6 @@
             
 #5 Check conflict with previously groundhog-loaded packages
     #Get currently active packages
-      .pkgenv[['active']] = active = get.active()
-      .pkgenv[['attached']] = get.attached() 
       check.conflict.before(snowball=snowball.all, pkg.requested=pkg, ignore.deps, date)  #check.snowball.conflict.R
         
 #6 Install snowball 
@@ -436,12 +531,16 @@
     #10.2 Verified: TRUE or FALSE?
         verified <- verify.snowball.loaded(snowball, ignore.deps)  
       
+    #10.2.5 Add msg to those that were attached via cache or were already attached
+
       
 	  #10.3 IF VERIFIED
        
         if (verified==TRUE) { 
           
-        
+        #10.3.5 Add entire snowball to cache
+          add.cache(snowball$pkg , date)
+          
         #10.4 Path for CRAN snowball 
             if (!'sha' %in% names(snowball))
             {
@@ -516,6 +615,28 @@
 
       }#End of  #10
                  
+     
+  #10.12 Add feedback on pkgs that were previously directly attached
+      attached = get.attached()
+      
+    #What packages were attached directly? (only for non-remotes we use cache so skip for others)
+      if (n.remote==0 & force.install==FALSE) 
+        {
+        pkg_direct = pkg_full_request[!pkg_full_request %in% pkg]
+    
+    #Loop over them
+      for (pkgk in pkg_direct)
+          {
+            pkgk_vrs = paste0(pkgk,"_",get.version(pkgk,date))
+            
+          #Message with installation feedback
+            if (pkgk_vrs %in% attached$pkg_vrs & !pkgk_vrs %in% attached_before$pkg_vrs)  message1("Successfully attached '",pkgk_vrs,"'")
+            if (pkgk_vrs %in% attached$pkg_vrs & pkgk_vrs %in% attached_before$pkg_vrs)  message1( "Had already  attached '",pkgk_vrs,"'")
+            if (!pkgk_vrs %in% attached$pkg_vrs) message("10.12 Failed to attached '",pkgk_vrs,"'")
+
+          }
+     
+      }
 #----------------------------------
   #11 Reminder of copy-method if something was installed.
       
