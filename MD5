@@ -1,8 +1,8 @@
-bb9f2dd14b42053a19fd3df2d9a13f9b *DESCRIPTION
+73d7c6bea5c5ecb677b85485206c38c7 *DESCRIPTION
 3cb7b3b330b39315b3b21779730319d4 *NAMESPACE
 0e5afe1492f97a4337b5b8df16b8bbb7 *R/all.already.attached.R
-20e70c7e62d7cc0fdab538507fd8ae6c *R/cache_functions.R
-f3de4c780153e3efd1a876d1502e636a *R/check.snowball.conflict.R
+da39a3f73cb7edca52846f374d712f84 *R/cache_functions.R
+5dfed48c10bd9692d9eba665f5a73996 *R/check.snowball.conflict.R
 113cd0f6eabb5f60f623222c1c87e120 *R/cross.toc.R
 29df0636d5c4754e1e92e4f18b4b128e *R/estimate.seconds.left.R
 5a5d7d82367945af6f5fc5ebdbb03a84 *R/file.rename.robust.R
@@ -19,8 +19,8 @@ cc5c8d081ee07ed4063aabaa55a32d03 *R/get.current.packages.R
 b81cea8580db6587a0799a9e39ceced7 *R/get.snowball.R
 c69a8faa2968bdc869cde7ad5f8ee0a7 *R/get.snowball.remote.R
 56956d49fe20b6bcc30d65ae74d138d5 *R/get.snowflakes.R
-b54f7279a188fd5444560dd8909029dd *R/get.version.R
-5b5a02cd3bb02b1f30fa439acaf2768e *R/groundhog.library.R
+0185bff9c1a3773fd518f6a0ce860278 *R/get.version.R
+758ab0d9cfa70287e0ae4206722d6157 *R/groundhog.library.R
 80043da7ddf424b39a4b33bd209c1b93 *R/install.binaries.R
 71e4ac2dd1311df0ce15b96731b18348 *R/install.one.R
 0f37982a59b9a3a9e78ae5d712cefea7 *R/install.snowball.R
