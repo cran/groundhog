@@ -1,4 +1,4 @@
-73d7c6bea5c5ecb677b85485206c38c7 *DESCRIPTION
+a781fc509b6c029b9d1d50acae7d2f5b *DESCRIPTION
 3cb7b3b330b39315b3b21779730319d4 *NAMESPACE
 0e5afe1492f97a4337b5b8df16b8bbb7 *R/all.already.attached.R
 da39a3f73cb7edca52846f374d712f84 *R/cache_functions.R
@@ -35,12 +35,12 @@ fdf7f7be34f9d21a1297ed3f26cc3375 *R/installation.feedback.R
 c325a836b29dd2d0fcb74ad001516207 *R/r.version.check.R
 20d917267479369588708e503789130b *R/remote_functions.R
 28a8ec1650a68ba82b3abe7f264e980c *R/restore.library.R
-2600574a2642e773126f409b19353e2d *R/toc.R
+ee1e8a53a47ae0a4b70ea8d440982aa8 *R/toc.R
 04f4bcd14a57d618ef2e52ff8eb2cd4a *R/try.renaming.method.again.R
 bc8770ad0c2612531960388c90fbf1e7 *R/update_cran.toc_if.needed.R
-5208c775a67ae332e88c53eff7825d94 *R/utils.R
-482cbeb401fec4a3a3530d39749e855f *R/validate.clone_date.R
-b7f9c9bea9704fc25ed1c2a5d799d818 *R/validate.groundhog.library.R
+9285a8b60facac8694e0324d2da8590f *R/utils.R
+a6155026211bcd6cb978b336cfd3f367 *R/validate.clone_date.R
+2ad66b8d50088df7dcaeb8273189f10d *R/validate.groundhog.library.R
 62251726b87b7c5e65e7a4b1975ad279 *R/validate.pkg_vrs.R
 54886ae2db95cfbe47e0e0dfaae987fb *R/validate_R.R
 0b85a4751018286e80bc11c556785a7e *R/verify.snowball.loaded.R

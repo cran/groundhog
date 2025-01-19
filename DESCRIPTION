@@ -1,6 +1,6 @@
 Package: groundhog
 Title: Version-Control for CRAN, GitHub, and GitLab Packages
-Version: 3.2.1
+Version: 3.2.2
 Authors@R: c(
     person(given = "Uri",
            family = "Simonsohn",
@@ -31,9 +31,9 @@ License: GPL-3
 Encoding: UTF-8
 RoxygenNote: 7.3.2
 NeedsCompilation: no
-Packaged: 2024-09-29 04:28:34 UTC; Zohn1
+Packaged: 2025-01-19 11:45:54 UTC; xpz_zohn
 Author: Uri Simonsohn [aut, cre] (<https://orcid.org/0000-0002-8601-7211>),
   Hugo Gruson [ctb, aut] (<https://orcid.org/0000-0002-4094-1476>)
 Maintainer: Uri Simonsohn <urisohn@gmail.com>
 Repository: CRAN
-Date/Publication: 2024-09-29 04:40:03 UTC
+Date/Publication: 2025-01-19 12:00:01 UTC
