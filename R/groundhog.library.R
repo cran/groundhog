@@ -97,6 +97,9 @@
                             tolerate.R.version = "" , cores = -1)
   {
     
+    # Initialize flag to track if snowball note has been shown (reset for each call)
+      .pkgenv[['snowball.note.shown']] <- FALSE
+    
 #--------------------------------------------------------------
 
   #1 Preliminaries
@@ -397,6 +400,29 @@
             snowball.list[[1]] <- snowball.all
       }
         
+#------------------------------------------------------------
+
+#3.3 Early feedback about packages that need to be downloaded
+      # Check if any packages need to be installed and provide early feedback
+      if (exists("snowball.all") && nrow(snowball.all) > 0) {
+        packages_to_install <- snowball.all[!snowball.all$installed, ]
+        if (nrow(packages_to_install) > 0) {
+          n_cran <- sum(packages_to_install$from == "CRAN", na.rm = TRUE)
+          n_gran <- sum(packages_to_install$from == "GRAN", na.rm = TRUE)
+          n_source <- sum(packages_to_install$from == "source", na.rm = TRUE)
+          
+          if (n_cran > 0 || n_gran > 0 || n_source > 0) {
+            msg_parts <- c()
+            if (n_cran > 0) msg_parts <- c(msg_parts, paste(n_cran, "from CRAN"))
+            if (n_gran > 0) msg_parts <- c(msg_parts, paste(n_gran, "from GRAN"))
+            if (n_source > 0) msg_parts <- c(msg_parts, paste(n_source, "from source"))
+            
+            message1("groundhog says: Will need to download ", nrow(packages_to_install), " packages (", 
+                    paste(msg_parts, collapse = ", "), ")")
+          }
+        }
+      }
+
 #------------------------------------------------------------
 
 #4 Create libpaths
